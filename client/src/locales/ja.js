@@ -6,6 +6,10 @@ export default {
     orders: '注文',
     finance: '財務',
     demandForecast: '需要予測',
+    collapse: '折りたたむ',
+    expand: '展開する',
+    reports: 'レポート',
+    restocking: '補充発注',
     companyName: '触媒コンポーネンツ',
     subtitle: '在庫管理システム'
   },
@@ -312,6 +316,57 @@ export default {
   },
 
   // Common
+  restocking: {
+    title: '補充発注',
+    description: '予算を設定し、需要予測で不足が見込まれる品目を発注します',
+    budget: '利用可能予算',
+    budgetHint: 'ドラッグして予算額を設定してください',
+    recommended: '推奨発注',
+    deferred: '予算超過',
+    deferredHint: '予算を増やせば対応できる不足分',
+    allocated: '割当額',
+    remaining: '残額',
+    totalNeed: '全不足分の解消費用',
+    itemsSelected: '{total}件中{count}件を選択',
+    placeOrder: '発注する',
+    placingOrder: '送信中...',
+    orderPlaced: '発注 {orderNumber} を送信しました — 納品予定 {date}',
+    overBudget: '選択額が予算を{amount}超過しています',
+    noRecommendations: 'この予算では不足はありません。予算を増やすかフィルターを解除してください。',
+    nothingSelected: '発注するには品目を1つ以上選択してください。',
+    leadTime: 'リードタイム',
+    leadTimeDays: '{days}日',
+    onHand: '在庫数',
+    forecast: '予測需要',
+    shortfall: '不足数',
+    orderQty: '発注数',
+    lineTotal: '小計',
+    include: '含める',
+    urgency: {
+      critical: '再発注点以下',
+      high: '高',
+      moderate: '中'
+    },
+    source: {
+      forecast: '需要予測',
+      order_history: '受注履歴からの推定'
+    }
+  },
+  submittedOrders: {
+    title: '送信済み発注',
+    description: '送信した補充発注の一覧',
+    empty: '送信済みの補充発注はまだありません。',
+    table: {
+      orderNumber: '発注番号',
+      submitted: '送信日',
+      items: '品目数',
+      units: '数量',
+      leadTime: 'リードタイム',
+      expectedDelivery: '納品予定日',
+      status: 'ステータス',
+      totalValue: '合計金額'
+    }
+  },
   common: {
     loading: '読み込み中...',
     error: 'エラー',

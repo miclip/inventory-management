@@ -1,43 +1,20 @@
 <template>
-  <div class="app">
-    <header class="top-nav">
-      <div class="nav-container">
-        <div class="logo">
-          <h1>{{ t('nav.companyName') }}</h1>
-          <span class="subtitle">{{ t('nav.subtitle') }}</span>
-        </div>
-        <nav class="nav-tabs">
-          <router-link to="/" :class="{ active: $route.path === '/' }">
-            {{ t('nav.overview') }}
-          </router-link>
-          <router-link to="/inventory" :class="{ active: $route.path === '/inventory' }">
-            {{ t('nav.inventory') }}
-          </router-link>
-          <router-link to="/orders" :class="{ active: $route.path === '/orders' }">
-            {{ t('nav.orders') }}
-          </router-link>
-          <router-link to="/spending" :class="{ active: $route.path === '/spending' }">
-            {{ t('nav.finance') }}
-          </router-link>
-          <router-link to="/demand" :class="{ active: $route.path === '/demand' }">
-            {{ t('nav.demandForecast') }}
-          </router-link>
-          <router-link to="/reports" :class="{ active: $route.path === '/reports' }">
-            Reports
-          </router-link>
-        </nav>
-        <LanguageSwitcher />
-        <ProfileMenu
-          @show-profile-details="showProfileDetails = true"
-          @show-tasks="showTasks = true"
-        />
-      </div>
-    </header>
-    <FilterBar />
-    <main class="main-content">
-      <router-view />
-    </main>
+  <div class="app-shell" :class="{ 'is-collapsed': sidebarCollapsed }">
+    <AppSidebar
+      :collapsed="sidebarCollapsed"
+      @toggle="toggleSidebar"
+      @show-profile-details="showProfileDetails = true"
+      @show-tasks="showTasks = true"
+    />
 
+    <div class="app-main">
+      <FilterBar />
+      <main class="app-content">
+        <router-view />
+      </main>
+    </div>
+
+    <!-- Modals live at shell level so they overlay the sidebar, not sit under it -->
     <ProfileDetailsModal
       :is-open="showProfileDetails"
       @close="showProfileDetails = false"
@@ -59,26 +36,32 @@ import { ref, onMounted, computed } from 'vue'
 import { api } from './api'
 import { useAuth } from './composables/useAuth'
 import { useI18n } from './composables/useI18n'
+import AppSidebar from './components/AppSidebar.vue'
 import FilterBar from './components/FilterBar.vue'
-import ProfileMenu from './components/ProfileMenu.vue'
 import ProfileDetailsModal from './components/ProfileDetailsModal.vue'
 import TasksModal from './components/TasksModal.vue'
-import LanguageSwitcher from './components/LanguageSwitcher.vue'
 
 export default {
   name: 'App',
   components: {
+    AppSidebar,
     FilterBar,
-    ProfileMenu,
     ProfileDetailsModal,
-    TasksModal,
-    LanguageSwitcher
+    TasksModal
   },
   setup() {
     const { currentUser } = useAuth()
     const { t } = useI18n()
     const showProfileDetails = ref(false)
     const showTasks = ref(false)
+
+    // Sidebar collapse survives reloads, matching how useI18n persists locale.
+    const sidebarCollapsed = ref(localStorage.getItem('sidebar-collapsed') === 'true')
+
+    const toggleSidebar = () => {
+      sidebarCollapsed.value = !sidebarCollapsed.value
+      localStorage.setItem('sidebar-collapsed', String(sidebarCollapsed.value))
+    }
     const apiTasks = ref([])
 
     // Merge mock tasks from currentUser with API tasks
@@ -150,6 +133,8 @@ export default {
 
     return {
       t,
+      sidebarCollapsed,
+      toggleSidebar,
       showProfileDetails,
       showTasks,
       tasks,
@@ -162,325 +147,377 @@ export default {
 </script>
 
 <style>
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+/* ===========================================================================
+   Tokens. Every value below this block references a token — no raw hex or
+   ad-hoc pixel spacing anywhere else in the app shell.
+
+   Direction: "instrument panel". A dark bezel (the sidebar) housing a light
+   workspace, with copper as the single accent and monospace figures for
+   anything a person would read off a dial: part numbers, quantities, money.
+   =========================================================================== */
+
+:root {
+  /* Spacing — 4px base scale */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+
+  /* Type */
+  --font-ui: 'Inter Tight', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  /* Workspace surfaces */
+  --bg-app: #f4f5f7;
+  --bg-surface: #ffffff;
+  --bg-sunk: #f6f7f9;
+  --border: #e3e6ea;
+  --border-strong: #cbd1d9;
+
+  /* Text */
+  --text: #14171c;
+  --text-soft: #4a5261;
+  --text-faint: #6b7382;
+  --text-dim: #97a0ae;
+
+  /* The bezel — dark instrument housing */
+  --bezel: #17191f;
+  --bezel-raised: #212530;
+  --bezel-line: #2c313c;
+  --bezel-tick: #383e4b;
+  --bezel-text: #9aa3b2;
+  --bezel-text-dim: #6d7583;
+  --bezel-text-strong: #f1f3f6;
+
+  /* Copper — the single accent */
+  --copper: #c2703d;
+  --copper-bright: #e2a074;
+  --copper-deep: #97522a;
+  --copper-dim: rgba(194, 112, 61, 0.14);
+  --copper-soft: #fdf3ec;
+  --copper-tint: #f7e2d3;
+  --copper-border: #e8c0a2;
+
+  /* Status (unchanged roles: green / blue / amber / red) */
+  --green: #15803d;   --green-soft: #f0fdf4;   --green-deep: #065f46;  --green-border: #bbf7d0;
+  --blue: #1d4ed8;    --blue-soft: #eff5ff;    --blue-deep: #1e3a8a;   --blue-border: #c7d9fe;
+  --amber: #b45309;   --amber-soft: #fffbeb;   --amber-deep: #92400e;  --amber-border: #fde68a;
+  --red: #b91c1c;     --red-soft: #fef2f2;     --red-deep: #7f1d1d;    --red-border: #fecaca;
+
+  /* Chart series. Four distinguishable hues for the cost categories, led by
+     the accent. Replaces the old blue/purple/green/amber set — the purple was
+     the only colour in the app outside the palette. */
+  --series-1: #c2703d;   /* copper  — procurement */
+  --series-2: #5b6472;   /* slate   — operational */
+  --series-3: #0f766e;   /* teal    — labor */
+  --series-4: #b45309;   /* amber   — overhead */
+  --series-1-soft: #fdf3ec;
+  --series-2-soft: #f2f4f6;
+  --series-3-soft: #effaf8;
+  --series-4-soft: #fffbeb;
+
+  /* Shape */
+  --radius: 6px;
+  --radius-lg: 10px;
+  --shadow-sm: 0 1px 2px rgba(20, 23, 28, 0.04);
+  --shadow-md: 0 4px 16px rgba(20, 23, 28, 0.08);
+
+  /* Layout */
+  --sidebar-w: 236px;
+  --sidebar-w-collapsed: 60px;
+  /* The filter bar's sticky offset. Was hardcoded to the old top nav's 70px in
+     two unrelated files; now one value both sides read. */
+  --topbar-h: 0px;
 }
 
+/* ---------------------------------------------------------------------------
+   Reset & base
+   --------------------------------------------------------------------------- */
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
 body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-  background: #f8fafc;
-  color: #1e293b;
+  font-family: var(--font-ui);
+  background: var(--bg-app);
+  color: var(--text);
+  font-size: 0.875rem;
+  line-height: 1.55;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-.app {
+/* ---------------------------------------------------------------------------
+   Shell: fixed bezel column, scrolling content column
+   --------------------------------------------------------------------------- */
+
+.app-shell {
+  display: grid;
+  grid-template-columns: var(--sidebar-w) 1fr;
+  min-height: 100vh;
+  transition: grid-template-columns 0.2s ease;
+}
+
+.app-shell.is-collapsed { grid-template-columns: var(--sidebar-w-collapsed) 1fr; }
+
+.app-main {
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
+  /* Required: without it a wide table stretches the grid column past the
+     viewport and puts a horizontal scrollbar on <body>. */
+  min-width: 0;
 }
 
-.top-nav {
-  background: #ffffff;
-  border-bottom: 1px solid #e2e8f0;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
-  position: sticky;
-  top: 0;
-  z-index: 100;
-}
-
-.nav-container {
-  max-width: 1600px;
-  margin: 0 auto;
-  display: flex;
-  align-items: center;
-  padding: 0 2rem;
-  height: 70px;
-}
-
-.nav-container > .nav-tabs {
-  margin-left: auto;
-  margin-right: 1rem;
-}
-
-.nav-container > .language-switcher {
-  margin-right: 1rem;
-}
-
-.logo {
-  display: flex;
-  align-items: baseline;
-  gap: 0.75rem;
-}
-
-.logo h1 {
-  font-size: 1.375rem;
-  font-weight: 700;
-  color: #0f172a;
-  letter-spacing: -0.025em;
-}
-
-.subtitle {
-  font-size: 0.813rem;
-  color: #64748b;
-  font-weight: 400;
-  padding-left: 0.75rem;
-  border-left: 1px solid #e2e8f0;
-}
-
-.nav-tabs {
-  display: flex;
-  gap: 0.25rem;
-}
-
-.nav-tabs a {
-  padding: 0.625rem 1.25rem;
-  color: #64748b;
-  text-decoration: none;
-  font-weight: 500;
-  font-size: 0.938rem;
-  border-radius: 6px;
-  transition: all 0.2s ease;
-  position: relative;
-}
-
-.nav-tabs a:hover {
-  color: #0f172a;
-  background: #f1f5f9;
-}
-
-.nav-tabs a.active {
-  color: #2563eb;
-  background: #eff6ff;
-}
-
-.nav-tabs a.active::after {
-  content: '';
-  position: absolute;
-  bottom: -1px;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: #2563eb;
-}
-
-.main-content {
+.app-content {
   flex: 1;
-  max-width: 1600px;
   width: 100%;
+  max-width: 1500px;   /* centering wrapper lives INSIDE the content column */
   margin: 0 auto;
-  padding: 1.5rem 2rem;
+  padding: var(--space-6);
 }
 
-.page-header {
-  margin-bottom: 1.5rem;
-}
+/* ---------------------------------------------------------------------------
+   Page header — rule above the title reads as a scale marking
+   --------------------------------------------------------------------------- */
+
+.page-header { margin-bottom: var(--space-5); }
 
 .page-header h2 {
-  font-size: 1.875rem;
-  font-weight: 700;
-  color: #0f172a;
-  margin-bottom: 0.375rem;
-  letter-spacing: -0.025em;
+  font-size: 1.5rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  margin-bottom: var(--space-1);
 }
 
 .page-header p {
-  color: #64748b;
-  font-size: 0.938rem;
-}
-
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 1.25rem;
-  margin-bottom: 1.5rem;
-}
-
-.stat-card {
-  background: white;
-  padding: 1.25rem;
-  border-radius: 10px;
-  border: 1px solid #e2e8f0;
-  transition: all 0.2s ease;
-}
-
-.stat-card:hover {
-  border-color: #cbd5e1;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
-}
-
-.stat-label {
-  color: #64748b;
+  color: var(--text-faint);
   font-size: 0.875rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-bottom: 0.625rem;
 }
 
-.stat-value {
-  font-size: 2.25rem;
-  font-weight: 700;
-  color: #0f172a;
-  letter-spacing: -0.025em;
-}
-
-.stat-card.warning .stat-value {
-  color: #ea580c;
-}
-
-.stat-card.success .stat-value {
-  color: #059669;
-}
-
-.stat-card.danger .stat-value {
-  color: #dc2626;
-}
-
-.stat-card.info .stat-value {
-  color: #2563eb;
-}
+/* ---------------------------------------------------------------------------
+   Cards
+   --------------------------------------------------------------------------- */
 
 .card {
-  background: white;
-  border-radius: 10px;
-  padding: 1.25rem;
-  border: 1px solid #e2e8f0;
-  margin-bottom: 1.25rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: var(--space-5);
+  overflow: hidden;   /* lets the header rule reach both edges */
 }
 
 .card-header {
   display: flex;
+  align-items: baseline;
   justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1rem;
-  padding-bottom: 0.875rem;
-  border-bottom: 1px solid #e2e8f0;
+  gap: var(--space-4);
+  padding: var(--space-4) var(--space-5);
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
 }
 
 .card-title {
-  font-size: 1.125rem;
-  font-weight: 700;
-  color: #0f172a;
-  letter-spacing: -0.025em;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: -0.01em;
 }
 
-.table-container {
-  overflow-x: auto;
+/* Cards that hold prose/controls rather than a table need their own padding,
+   since .card itself no longer carries any. */
+.card > *:not(.card-header):not(.table-container):not(table) {
+  padding-left: var(--space-5);
+  padding-right: var(--space-5);
 }
+.card > *:not(.card-header):not(.table-container):not(table):first-child { padding-top: var(--space-5); }
+.card > *:not(.card-header):not(.table-container):not(table):last-child { padding-bottom: var(--space-5); }
+
+/* ---------------------------------------------------------------------------
+   Stat tiles — copper top edge, mono value, gauge-style label
+   --------------------------------------------------------------------------- */
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(212px, 1fr));
+  gap: var(--space-4);
+  margin-bottom: var(--space-5);
+}
+
+.stat-card {
+  position: relative;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  padding: var(--space-4) var(--space-5);
+  overflow: hidden;
+}
+
+/* The instrument tell: a 2px indicator edge, copper by default and recoloured
+   by the status modifier classes the views already pass. */
+.stat-card::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 2px;
+  background: var(--copper);
+}
+
+.stat-card.success::before { background: var(--green); }
+.stat-card.info::before    { background: var(--blue); }
+.stat-card.warning::before { background: var(--amber); }
+.stat-card.danger::before  { background: var(--red); }
+
+.stat-label {
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  font-weight: 500;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  margin-bottom: var(--space-2);
+}
+
+.stat-value {
+  font-family: var(--font-mono);
+  font-size: 1.625rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  line-height: 1.1;
+  /* Stops digits from jittering as filters change the number's width */
+  font-variant-numeric: tabular-nums;
+}
+
+.stat-card.success .stat-value { color: var(--green); }
+.stat-card.info .stat-value    { color: var(--blue); }
+.stat-card.warning .stat-value { color: var(--amber); }
+.stat-card.danger .stat-value  { color: var(--red); }
+
+/* ---------------------------------------------------------------------------
+   Tables — compact operations density
+   --------------------------------------------------------------------------- */
+
+.table-container { overflow-x: auto; }
 
 table {
   width: 100%;
   border-collapse: collapse;
 }
 
-thead {
-  background: #f8fafc;
-  border-top: 1px solid #e2e8f0;
-  border-bottom: 1px solid #e2e8f0;
-}
+thead { background: var(--bg-sunk); }
 
-th {
-  text-align: left;
-  padding: 0.5rem 0.75rem;
-  font-weight: 600;
-  color: #475569;
-  font-size: 0.75rem;
+thead th {
+  padding: var(--space-2) var(--space-4);
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  font-weight: 500;
+  letter-spacing: 0.09em;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  color: var(--text-faint);
+  text-align: left;
+  white-space: nowrap;
+  border-bottom: 1px solid var(--border);
 }
 
-td {
-  padding: 0.5rem 0.75rem;
-  border-top: 1px solid #f1f5f9;
-  color: #334155;
-  font-size: 0.875rem;
+tbody td {
+  padding: var(--space-2) var(--space-4);
+  border-bottom: 1px solid var(--border);
+  font-size: 0.8125rem;
+  color: var(--text-soft);
+  height: 38px;
+  font-variant-numeric: tabular-nums;
 }
 
-tbody tr {
-  transition: background-color 0.15s ease;
+tbody tr:last-child td { border-bottom: 0; }
+tbody tr:hover { background: var(--bg-sunk); }
+
+tbody td strong { color: var(--text); font-weight: 600; }
+
+/* Part numbers, order numbers and any code-like cell read as instrument
+   labels. Views mark these with <strong> in the first column. */
+tbody td:first-child strong {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: -0.01em;
 }
 
-tbody tr:hover {
-  background: #f8fafc;
-}
+/* ---------------------------------------------------------------------------
+   Badges
+   --------------------------------------------------------------------------- */
 
 .badge {
-  display: inline-block;
-  padding: 0.313rem 0.75rem;
-  border-radius: 6px;
-  font-size: 0.75rem;
-  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.125rem var(--space-2);
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
-  letter-spacing: 0.025em;
+  white-space: nowrap;
+  border: 1px solid transparent;
 }
 
-.badge.success {
-  background: #d1fae5;
-  color: #065f46;
-}
+.badge.success, .badge.increasing { background: var(--green-soft); color: var(--green); border-color: #bbf7d0; }
+.badge.info, .badge.stable        { background: var(--blue-soft);  color: var(--blue);  border-color: #c7d9fe; }
+.badge.warning, .badge.medium     { background: var(--amber-soft); color: var(--amber); border-color: #fde68a; }
+.badge.danger, .badge.high, .badge.decreasing { background: var(--red-soft); color: var(--red); border-color: #fecaca; }
+.badge.low { background: var(--bg-sunk); color: var(--text-faint); border-color: var(--border); }
 
-.badge.warning {
-  background: #fed7aa;
-  color: #92400e;
-}
+/* ---------------------------------------------------------------------------
+   States
+   --------------------------------------------------------------------------- */
 
-.badge.danger {
-  background: #fecaca;
-  color: #991b1b;
-}
-
-.badge.info {
-  background: #dbeafe;
-  color: #1e40af;
-}
-
-.badge.increasing {
-  background: #d1fae5;
-  color: #065f46;
-}
-
-.badge.decreasing {
-  background: #fecaca;
-  color: #991b1b;
-}
-
-.badge.stable {
-  background: #e0e7ff;
-  color: #3730a3;
-}
-
-.badge.high {
-  background: #fecaca;
-  color: #991b1b;
-}
-
-.badge.medium {
-  background: #fed7aa;
-  color: #92400e;
-}
-
-.badge.low {
-  background: #dbeafe;
-  color: #1e40af;
-}
-
-.loading {
+.loading, .error {
+  padding: var(--space-6);
   text-align: center;
-  padding: 3rem;
-  color: #64748b;
-  font-size: 0.938rem;
+  font-size: 0.875rem;
+  color: var(--text-faint);
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
 }
 
-.error {
-  background: #fef2f2;
-  border: 1px solid #fecaca;
-  color: #991b1b;
-  padding: 1rem;
-  border-radius: 8px;
-  margin: 1rem 0;
-  font-size: 0.938rem;
+.error { color: var(--red); border-color: #fecaca; background: var(--red-soft); }
+
+/* ---------------------------------------------------------------------------
+   Focus — visible keyboard affordance everywhere
+   --------------------------------------------------------------------------- */
+
+a:focus-visible,
+button:focus-visible,
+select:focus-visible,
+input:focus-visible {
+  outline: 2px solid var(--copper);
+  outline-offset: 2px;
+}
+
+/* ---------------------------------------------------------------------------
+   Responsive
+   --------------------------------------------------------------------------- */
+
+/* Tablet: collapse to the icon rail regardless of the stored preference */
+@media (max-width: 1024px) {
+  .app-shell,
+  .app-shell.is-collapsed { grid-template-columns: var(--sidebar-w-collapsed) 1fr; }
+  .app-content { padding: var(--space-5); }
+}
+
+/* Mobile: bezel becomes an off-canvas drawer, opened from the filter bar */
+@media (max-width: 768px) {
+  .app-shell,
+  .app-shell.is-collapsed { grid-template-columns: 1fr; }
+  /* Extra bottom padding clears the fixed bottom tab bar, so the last table
+     row is not trapped underneath it. */
+  .app-content { padding: var(--space-4) var(--space-4) 5rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-shell { transition: none; }
 }
 </style>

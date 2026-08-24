@@ -6,6 +6,10 @@ export default {
     orders: 'Orders',
     finance: 'Finance',
     demandForecast: 'Demand Forecast',
+    collapse: 'Collapse',
+    expand: 'Expand',
+    reports: 'Reports',
+    restocking: 'Restocking',
     companyName: 'Catalyst Components',
     subtitle: 'Inventory Management System'
   },
@@ -312,6 +316,57 @@ export default {
   },
 
   // Common
+  restocking: {
+    title: 'Restocking',
+    description: 'Set a budget and order the items your forecast says you will run short of',
+    budget: 'Available Budget',
+    budgetHint: 'Drag to set how much you have to spend',
+    recommended: 'Recommended Order',
+    deferred: 'Over Budget',
+    deferredHint: 'Shortfalls a larger budget would cover',
+    allocated: 'Allocated',
+    remaining: 'Remaining',
+    totalNeed: 'Cost to clear all shortfalls',
+    itemsSelected: '{count} of {total} items selected',
+    placeOrder: 'Place Order',
+    placingOrder: 'Submitting...',
+    orderPlaced: 'Order {orderNumber} submitted — expected {date}',
+    overBudget: 'Selection exceeds budget by {amount}',
+    noRecommendations: 'No shortfalls at this budget. Increase the budget or clear the filters.',
+    nothingSelected: 'Select at least one item to place an order.',
+    leadTime: 'Lead Time',
+    leadTimeDays: '{days} days',
+    onHand: 'On Hand',
+    forecast: 'Forecast',
+    shortfall: 'Shortfall',
+    orderQty: 'Order Qty',
+    lineTotal: 'Line Total',
+    include: 'Include',
+    urgency: {
+      critical: 'Below reorder point',
+      high: 'High',
+      moderate: 'Moderate'
+    },
+    source: {
+      forecast: 'Demand forecast',
+      order_history: 'Projected from order history'
+    }
+  },
+  submittedOrders: {
+    title: 'Submitted Orders',
+    description: 'Restocking orders you have placed',
+    empty: 'No restocking orders submitted yet.',
+    table: {
+      orderNumber: 'Order Number',
+      submitted: 'Submitted',
+      items: 'Items',
+      units: 'Units',
+      leadTime: 'Lead Time',
+      expectedDelivery: 'Expected Delivery',
+      status: 'Status',
+      totalValue: 'Total Value'
+    }
+  },
   common: {
     loading: 'Loading...',
     error: 'Error',
