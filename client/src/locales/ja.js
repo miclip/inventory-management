@@ -344,6 +344,24 @@ export default {
       bestQuarter: '最高業績四半期'
     }
   },
+  coverage: {
+    daysCover: '在庫日数',
+    leadTime: 'リードタイム',
+    dailyDemand: '日次需要',
+    reorderQty: '発注必要数',
+    risk: 'リスク',
+    unbounded: '需要なし',
+    days: '{days}日',
+    atRisk: 'リスクあり',
+    atRiskHint: '在庫日数がリードタイムを下回っています',
+    level: {
+      stockout: '在庫切れ',
+      critical: '納品前に在庫切れ',
+      warning: '余裕わずか',
+      ok: '充足',
+      idle: '滞留在庫'
+    }
+  },
   restocking: {
     title: '補充発注',
     description: '予算を設定し、需要予測で不足が見込まれる品目を発注します',
@@ -371,10 +389,11 @@ export default {
     lineTotal: '小計',
     include: '含める',
     urgency: {
-      critical: '再発注点以下',
-      high: '高',
+      critical: '納品前に在庫切れ',
+      high: '余裕わずか',
       moderate: '中'
     },
+    coverColumn: '在庫日数',
     source: {
       forecast: '需要予測',
       order_history: '受注履歴からの推定'

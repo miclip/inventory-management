@@ -345,6 +345,24 @@ export default {
       bestQuarter: 'Best Performing Quarter'
     }
   },
+  coverage: {
+    daysCover: 'Days Cover',
+    leadTime: 'Lead Time',
+    dailyDemand: 'Daily Demand',
+    reorderQty: 'Reorder Qty',
+    risk: 'Risk',
+    unbounded: 'No demand',
+    days: '{days}d',
+    atRisk: 'At Risk',
+    atRiskHint: 'Cover shorter than the supplier lead time',
+    level: {
+      stockout: 'Out of stock',
+      critical: 'Stockout before resupply',
+      warning: 'Thin margin',
+      ok: 'Covered',
+      idle: 'Idle stock'
+    }
+  },
   restocking: {
     title: 'Restocking',
     description: 'Set a budget and order the items your forecast says you will run short of',
@@ -372,10 +390,11 @@ export default {
     lineTotal: 'Line Total',
     include: 'Include',
     urgency: {
-      critical: 'Below reorder point',
-      high: 'High',
+      critical: 'Stockout before resupply',
+      high: 'Thin margin',
       moderate: 'Moderate'
     },
+    coverColumn: 'Cover',
     source: {
       forecast: 'Demand forecast',
       order_history: 'Projected from order history'

@@ -12,6 +12,16 @@ export const api = {
     return response.data
   },
 
+  async getInventoryCoverage(filters = {}) {
+    const params = new URLSearchParams()
+    // Coverage has no time or order-status dimension, same as plain inventory.
+    if (filters.warehouse && filters.warehouse !== 'all') params.append('warehouse', filters.warehouse)
+    if (filters.category && filters.category !== 'all') params.append('category', filters.category)
+
+    const response = await axios.get(`${API_BASE_URL}/inventory/coverage?${params.toString()}`)
+    return response.data
+  },
+
   async getInventoryItem(id) {
     const response = await axios.get(`${API_BASE_URL}/inventory/${id}`)
     return response.data

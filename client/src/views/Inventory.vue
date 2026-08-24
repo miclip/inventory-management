@@ -11,6 +11,9 @@
       <div class="card">
         <div class="card-header">
           <h3 class="card-title">{{ t('inventory.stockLevels') }} ({{ filteredItems.length }} {{ t('inventory.skus') }})</h3>
+          <span v-if="atRiskCount > 0" class="at-risk-count" :title="t('coverage.atRiskHint')">
+            {{ atRiskCount }} {{ t('coverage.atRisk') }}
+          </span>
           <div class="search-box">
             <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
               <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
@@ -42,16 +45,19 @@
                 <th>{{ t('inventory.table.category') }}</th>
                 <th>{{ t('inventory.table.quantityOnHand') }}</th>
                 <th>{{ t('inventory.table.reorderPoint') }}</th>
+                <th class="num">{{ t('coverage.daysCover') }}</th>
+                <th class="num">{{ t('coverage.leadTime') }}</th>
+                <th>{{ t('coverage.risk') }}</th>
+                <th class="num">{{ t('coverage.reorderQty') }}</th>
                 <th>{{ t('inventory.table.unitCost') }}</th>
                 <th>{{ t('inventory.table.totalValue') }}</th>
                 <th>{{ t('inventory.table.location') }}</th>
-                <th>{{ t('inventory.table.status') }}</th>
               </tr>
             </thead>
             <tbody>
               <tr
                 v-for="item in filteredItems"
-                :key="item.id"
+                :key="item.sku"
                 class="clickable-row"
                 @click="showItemDetail(item)"
               >
@@ -60,12 +66,20 @@
                 <td>{{ translateCategory(item.category) }}</td>
                 <td><strong>{{ item.quantity_on_hand }}</strong></td>
                 <td>{{ item.reorder_point }}</td>
+                <td class="num" :class="coverClass(item)">{{ formatCover(item) }}</td>
+                <td class="num">{{ t('coverage.days', { days: item.lead_time_days }) }}</td>
+                <td>
+                  <span :class="['badge', riskClass(item.risk)]">{{ t(`coverage.level.${item.risk}`) }}</span>
+                </td>
+                <td class="num">
+                  <strong v-if="item.shortfall_at_lead_time > 0">
+                    {{ item.shortfall_at_lead_time.toLocaleString() }}
+                  </strong>
+                  <span v-else class="dim">&mdash;</span>
+                </td>
                 <td>{{ currencySymbol }}{{ item.unit_cost.toFixed(2) }}</td>
                 <td><strong>{{ currencySymbol }}{{ (item.quantity_on_hand * item.unit_cost).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) }}</strong></td>
                 <td>{{ translateWarehouse(item.location) }}</td>
-                <td>
-                  <span :class="['badge', getStockStatusClass(item)]">{{ getStockStatus(item) }}</span>
-                </td>
               </tr>
             </tbody>
           </table>
@@ -112,18 +126,31 @@ export default {
     // Use shared filters
     const { selectedLocation, selectedCategory, getCurrentFilters } = useFilters()
 
-    // Stock status order for sorting (using status keys)
-    const STATUS_ORDER = { 'lowStock': 0, 'adequate': 1, 'inStock': 2 }
+    // Worst risk first. The server already returns rows in this order; the
+    // map is here because the search filter re-sorts client-side.
+    const RISK_ORDER = { stockout: 0, critical: 1, warning: 2, ok: 3, idle: 4 }
 
-    // Get stock status key (for sorting and translation)
-    const getStockStatusKey = (item) => {
-      if (item.quantity_on_hand <= item.reorder_point) {
-        return 'lowStock'
-      } else if (item.quantity_on_hand <= item.reorder_point * 1.5) {
-        return 'adequate'
-      } else {
-        return 'inStock'
-      }
+    // An item is genuinely at risk when it will run dry before a replacement
+    // can land — not merely when it dips below its reorder point, which knows
+    // nothing about how long resupply takes.
+    const atRiskCount = computed(() =>
+      items.value.filter(i => i.risk === 'stockout' || i.risk === 'critical').length
+    )
+
+    const formatCover = (item) => {
+      if (item.days_of_cover === null) return t('coverage.unbounded')
+      return t('coverage.days', { days: item.days_of_cover.toFixed(1) })
+    }
+
+    const coverClass = (item) => {
+      if (item.risk === 'stockout' || item.risk === 'critical') return 'cover-critical'
+      if (item.risk === 'warning') return 'cover-warning'
+      return ''
+    }
+
+    const riskClass = (risk) => {
+      const map = { stockout: 'danger', critical: 'danger', warning: 'warning', ok: 'success', idle: 'low' }
+      return map[risk] || 'low'
     }
 
     // Computed property to filter items by search query and sort by stock status
@@ -138,12 +165,14 @@ export default {
         )
       }
 
-      // Sort by stock status: Low Stock first, then Adequate, then In Stock
-      // Always create a copy to avoid mutating the original array
+      // Worst risk first, then least cover. Copy before sorting so the source
+      // ref is not mutated.
       return filtered.slice().sort((a, b) => {
-        const statusA = getStockStatusKey(a)
-        const statusB = getStockStatusKey(b)
-        return STATUS_ORDER[statusA] - STATUS_ORDER[statusB]
+        const byRisk = RISK_ORDER[a.risk] - RISK_ORDER[b.risk]
+        if (byRisk !== 0) return byRisk
+        const coverA = a.days_of_cover === null ? Infinity : a.days_of_cover
+        const coverB = b.days_of_cover === null ? Infinity : b.days_of_cover
+        return coverA - coverB
       })
     })
 
@@ -151,8 +180,9 @@ export default {
       try {
         loading.value = true
         const filters = getCurrentFilters()
-        // Inventory doesn't support month/status filters, only warehouse and category
-        items.value = await api.getInventory({
+        // The coverage endpoint returns every inventory field plus the
+        // days-of-cover metrics, so it replaces the plain inventory call.
+        items.value = await api.getInventoryCoverage({
           warehouse: filters.warehouse,
           category: filters.category
         })
@@ -167,21 +197,6 @@ export default {
     watch([selectedLocation, selectedCategory], () => {
       loadInventory()
     })
-
-    const getStockStatus = (item) => {
-      const key = getStockStatusKey(item)
-      return t(`status.${key}`)
-    }
-
-    const getStockStatusClass = (item) => {
-      if (item.quantity_on_hand <= item.reorder_point) {
-        return 'danger'
-      } else if (item.quantity_on_hand <= item.reorder_point * 1.5) {
-        return 'warning'
-      } else {
-        return 'success'
-      }
-    }
 
     const translateCategory = (category) => {
       const categoryMap = {
@@ -208,8 +223,10 @@ export default {
       items,
       searchQuery,
       filteredItems,
-      getStockStatus,
-      getStockStatusClass,
+      atRiskCount,
+      formatCover,
+      coverClass,
+      riskClass,
       translateCategory,
       showItemModal,
       selectedItem,
@@ -223,6 +240,29 @@ export default {
 </script>
 
 <style scoped>
+.num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+th.num { text-align: right; }
+
+/* Cover shorter than the lead time is the alarm condition. */
+.cover-critical { color: var(--red-deep); font-weight: 600; }
+.cover-warning { color: var(--amber-deep); font-weight: 600; }
+
+.dim { color: var(--text-dim); }
+
+.at-risk-count {
+  font-size: 0.625rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--red-deep);
+  border: 1px solid var(--red-border);
+  padding: 0.1rem var(--space-2);
+  white-space: nowrap;
+}
+
 .page-header {
   margin-bottom: 1.5rem;
 }

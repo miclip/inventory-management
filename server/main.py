@@ -122,6 +122,25 @@ class CreatePurchaseOrderRequest(BaseModel):
     expected_delivery_date: str
     notes: Optional[str] = None
 
+class InventoryCoverage(BaseModel):
+    sku: str
+    name: str
+    category: str
+    warehouse: str
+    location: str
+    quantity_on_hand: int
+    reorder_point: int
+    unit_cost: float
+    forecasted_demand: int
+    demand_source: str
+    daily_demand: float
+    # None means "unbounded": no demand signal, so the stock never depletes.
+    days_of_cover: Optional[float] = None
+    lead_time_days: int
+    risk: str
+    shortfall_at_lead_time: int
+    below_reorder_point: bool
+
 class RestockCandidate(BaseModel):
     sku: str
     name: str
@@ -138,6 +157,9 @@ class RestockCandidate(BaseModel):
     below_reorder_point: bool
     urgency: str
     lead_time_days: int
+    daily_demand: float
+    days_of_cover: Optional[float] = None
+    risk: str
 
 class RestockingRecommendations(BaseModel):
     budget: float
@@ -192,6 +214,47 @@ def get_inventory(
 ):
     """Get all inventory items with optional filtering"""
     return apply_filters(inventory_items, warehouse, category)
+
+@app.get("/api/inventory/coverage", response_model=List[InventoryCoverage])
+def get_inventory_coverage(
+    warehouse: Optional[str] = None,
+    category: Optional[str] = None
+):
+    """Days of stock cover per SKU, and the risk that implies.
+
+    Declared before /api/inventory/{item_id} deliberately: Starlette matches
+    routes in registration order, so putting this after the path-param route
+    would make it resolve as item_id="coverage" and 404.
+    """
+    forecasts = _forecast_lookup()
+    historical = _demand_from_order_history()
+    rows = []
+
+    for item in apply_filters(inventory_items, warehouse, category):
+        demand, source = resolve_demand(item, forecasts, historical)
+        cover = coverage_for_item(item, demand)
+        rows.append({
+            'sku': item['sku'],
+            'name': item['name'],
+            'category': item['category'],
+            'warehouse': item['warehouse'],
+            'location': item['location'],
+            'quantity_on_hand': item['quantity_on_hand'],
+            'reorder_point': item['reorder_point'],
+            'unit_cost': item['unit_cost'],
+            'forecasted_demand': demand,
+            'demand_source': source,
+            'below_reorder_point': item['quantity_on_hand'] <= item['reorder_point'],
+            **cover,
+        })
+
+    # Most urgent first: worst risk, then least cover, then largest gap.
+    rows.sort(key=lambda r: (
+        RISK_ORDER[r['risk']],
+        r['days_of_cover'] if r['days_of_cover'] is not None else float('inf'),
+        -r['shortfall_at_lead_time'],
+    ))
+    return rows
 
 @app.get("/api/inventory/{item_id}", response_model=InventoryItem)
 def get_inventory_item(item_id: str):
@@ -413,6 +476,87 @@ def lead_time_for_category(category: str) -> int:
     return LEAD_TIMES_BY_CATEGORY.get((category or '').lower(), DEFAULT_LEAD_TIME_DAYS)
 
 
+# Both demand signals are 30-day figures — the curated forecast's period is
+# "Next 30 days", and the order-history projection is per-month — so one
+# divisor converts either to a daily rate.
+DEMAND_PERIOD_DAYS = 30
+
+# Slack above the lead time that still counts as comfortable. Below the lead
+# time an item cannot be replenished before it runs dry; below this multiple it
+# can, but with no room for a late shipment.
+COVER_WARNING_FACTOR = 1.5
+
+# Sort weight, worst first.
+RISK_ORDER = {'stockout': 0, 'critical': 1, 'warning': 2, 'ok': 3, 'idle': 4}
+
+
+def resolve_demand(item: dict, forecasts: dict, historical: dict):
+    """30-day demand for an item, plus which signal produced it.
+
+    The curated forecast wins where it can be matched (by SKU, then by product
+    name); order history covers everything else. See _forecast_lookup for why
+    the name fallback exists.
+    """
+    forecast_demand = forecasts.get(item['sku'], forecasts.get(item['name']))
+    if forecast_demand is not None:
+        return forecast_demand, 'forecast'
+    return historical.get(item['sku'], 0), 'order_history'
+
+
+def coverage_for_item(item: dict, demand: int) -> dict:
+    """Days of stock remaining, and the risk that implies given the lead time.
+
+    Days of cover against lead time is the operative reorder signal, and it is
+    strictly better than the reorder point on its own: an item can sit ABOVE
+    its reorder point and still be a guaranteed stockout, because the reorder
+    point knows nothing about how long resupply takes. SRV-302 is the example
+    in this dataset — 28 units against an 18-day actuator lead time.
+    """
+    on_hand = item['quantity_on_hand']
+    lead_time = lead_time_for_category(item['category'])
+
+    # Round the daily rate BEFORE deriving anything from it, so every number in
+    # the response reconciles with every other one. Deriving cover from the
+    # unrounded rate while publishing the rounded one leaves a client that
+    # recomputes on_hand / daily_demand with a different answer than
+    # days_of_cover, and puts rows whose rounded cover lands exactly on a
+    # threshold into the wrong risk band.
+    daily = round(demand / DEMAND_PERIOD_DAYS, 2) if demand else 0.0
+
+    if daily <= 0:
+        # No demand signal, so the stock never depletes and cover is unbounded.
+        # Reported as null rather than a sentinel number, and flagged idle:
+        # capital parked on a SKU nobody orders is its own kind of problem.
+        return {
+            'daily_demand': 0.0,
+            'days_of_cover': None,
+            'lead_time_days': lead_time,
+            'risk': 'idle',
+            'shortfall_at_lead_time': 0,
+        }
+
+    days_of_cover = round(on_hand / daily, 1)
+
+    if on_hand <= 0:
+        risk = 'stockout'
+    elif days_of_cover < lead_time:
+        risk = 'critical'
+    elif days_of_cover < lead_time * COVER_WARNING_FACTOR:
+        risk = 'warning'
+    else:
+        risk = 'ok'
+
+    return {
+        'daily_demand': daily,
+        'days_of_cover': days_of_cover,
+        'lead_time_days': lead_time,
+        'risk': risk,
+        # Units consumed over one lead time that are not on hand — the true
+        # reorder quantity, as opposed to the gap to the reorder point.
+        'shortfall_at_lead_time': max(0, round(daily * lead_time) - on_hand),
+    }
+
+
 def _forecast_lookup() -> dict:
     """Index demand_forecasts.json by both SKU and product name.
 
@@ -461,8 +605,8 @@ def build_restock_candidates(warehouse: Optional[str] = None,
     Demand comes from the curated forecast where it can be matched, and from
     projected order history otherwise; demand_source records which was used so
     the UI can show the provenance. Sort order encodes the urgency-first
-    policy: items at or below their reorder point come before everything else,
-    then the largest shortfall wins.
+    policy, now keyed on days of cover against the supplier lead time rather
+    than on the reorder point.
     """
     forecasts = _forecast_lookup()
     historical = _demand_from_order_history()
@@ -470,15 +614,7 @@ def build_restock_candidates(warehouse: Optional[str] = None,
 
     for item in apply_filters(inventory_items, warehouse, category):
         sku = item['sku']
-
-        # Match the curated forecast on SKU first, then on product name.
-        forecast_demand = forecasts.get(sku, forecasts.get(item['name']))
-        if forecast_demand is not None:
-            demand = forecast_demand
-            source = 'forecast'
-        else:
-            demand = historical.get(sku, 0)
-            source = 'order_history'
+        demand, source = resolve_demand(item, forecasts, historical)
 
         on_hand = item['quantity_on_hand']
         shortfall = max(0, demand - on_hand)
@@ -486,9 +622,14 @@ def build_restock_candidates(warehouse: Optional[str] = None,
             continue
 
         below_reorder = on_hand <= item['reorder_point']
-        if below_reorder:
+
+        # Urgency now derives from days of cover against the lead time rather
+        # than from the reorder point, so an item that will run dry before a
+        # replacement can land ranks critical even when it is above its point.
+        cover = coverage_for_item(item, demand)
+        if cover['risk'] in ('stockout', 'critical'):
             urgency = 'critical'
-        elif shortfall > on_hand:
+        elif cover['risk'] == 'warning':
             urgency = 'high'
         else:
             urgency = 'moderate'
@@ -508,11 +649,19 @@ def build_restock_candidates(warehouse: Optional[str] = None,
             'line_total': 0.0,
             'below_reorder_point': below_reorder,
             'urgency': urgency,
-            'lead_time_days': lead_time_for_category(item['category']),
+            'lead_time_days': cover['lead_time_days'],
+            'daily_demand': cover['daily_demand'],
+            'days_of_cover': cover['days_of_cover'],
+            'risk': cover['risk'],
         })
 
-    # Urgency-first: below-reorder-point items lead, then largest shortfall.
-    candidates.sort(key=lambda c: (0 if c['below_reorder_point'] else 1, -c['shortfall']))
+    # Urgency-first: worst risk leads, then the least cover, then the largest
+    # shortfall. Items with no demand signal have unbounded cover and sort last.
+    candidates.sort(key=lambda c: (
+        RISK_ORDER[c['risk']],
+        c['days_of_cover'] if c['days_of_cover'] is not None else float('inf'),
+        -c['shortfall'],
+    ))
     return candidates
 
 

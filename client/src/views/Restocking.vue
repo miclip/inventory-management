@@ -82,6 +82,7 @@
                   <th class="col-include">{{ t('restocking.include') }}</th>
                   <th class="col-item">{{ t('inventory.table.itemName') }}</th>
                   <th class="col-num">{{ t('restocking.onHand') }}</th>
+                  <th class="col-num">{{ t('restocking.coverColumn') }}</th>
                   <th class="col-num">{{ t('restocking.forecast') }}</th>
                   <th class="col-num">{{ t('restocking.shortfall') }}</th>
                   <th class="col-qty">{{ t('restocking.orderQty') }}</th>
@@ -106,6 +107,7 @@
                     </div>
                   </td>
                   <td class="col-num">{{ row.quantity_on_hand.toLocaleString() }}</td>
+                  <td class="col-num" :class="coverClass(row)">{{ formatCover(row) }}</td>
                   <td class="col-num">{{ row.forecasted_demand.toLocaleString() }}</td>
                   <td class="col-num strong">{{ row.shortfall.toLocaleString() }}</td>
                   <td class="col-qty">
@@ -325,6 +327,21 @@ export default {
       return `${symbol}${Math.round(value / 1000)}K`
     }
 
+    // Days of cover is what now drives the urgency ranking, so it belongs on
+    // the row: the reader can see why an item outranks a bigger shortfall.
+    const formatCover = (row) => {
+      if (row.days_of_cover === null || row.days_of_cover === undefined) {
+        return t('coverage.unbounded')
+      }
+      return t('coverage.days', { days: row.days_of_cover.toFixed(1) })
+    }
+
+    const coverClass = (row) => {
+      if (row.risk === 'stockout' || row.risk === 'critical') return 'cover-critical'
+      if (row.risk === 'warning') return 'cover-warning'
+      return ''
+    }
+
     const urgencyClass = (urgency) => {
       const map = { critical: 'danger', high: 'warning', moderate: 'info' }
       return map[urgency] || 'info'
@@ -357,6 +374,8 @@ export default {
       orderLeadTime,
       canPlaceOrder,
       lineTotal,
+      formatCover,
+      coverClass,
       clampQuantity,
       placeOrder,
       formatMoney,
@@ -546,6 +565,9 @@ tr.excluded { opacity: 0.45; }
 .col-num, .col-qty { font-variant-numeric: tabular-nums; }
 
 .strong { font-weight: 600; color: var(--text); }
+
+.cover-critical { color: var(--red-deep); font-weight: 600; }
+.cover-warning { color: var(--amber-deep); font-weight: 600; }
 .muted { color: var(--text-faint); }
 
 .qty-input {
