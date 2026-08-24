@@ -166,8 +166,6 @@ const close = () => {
 
 .modal-container {
   background: var(--bg-surface);
-  border-radius: 12px;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
   max-width: 600px;
   width: 100%;
   max-height: 90vh;
@@ -200,7 +198,6 @@ const close = () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 6px;
   transition: all 0.15s ease;
 }
 
@@ -221,13 +218,13 @@ const close = () => {
 
 .summary-card {
   padding: 1.5rem;
-  border-radius: 10px;
   text-align: center;
 }
 
 .summary-card.total {
-  background: var(--copper);
-  color: white;
+  background: var(--accent);
+  color: var(--bg-app);
+  text-shadow: none;
 }
 
 .summary-label {
@@ -252,7 +249,6 @@ const close = () => {
 
 .cost-item {
   padding: 1.25rem;
-  border-radius: 10px;
   border: 2px solid;
 }
 
@@ -286,7 +282,6 @@ const close = () => {
 .cost-icon {
   width: 48px;
   height: 48px;
-  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -295,22 +290,26 @@ const close = () => {
 
 .cost-item.procurement .cost-icon {
   background: var(--series-1);
-  color: white;
+  color: var(--bg-app);
+  text-shadow: none;
 }
 
 .cost-item.operational .cost-icon {
   background: var(--series-2);
-  color: white;
+  color: var(--bg-app);
+  text-shadow: none;
 }
 
 .cost-item.labor .cost-icon {
   background: var(--green);
-  color: white;
+  color: var(--bg-app);
+  text-shadow: none;
 }
 
 .cost-item.overhead .cost-icon {
   background: var(--amber);
-  color: white;
+  color: var(--bg-app);
+  text-shadow: none;
 }
 
 .cost-info {
@@ -347,7 +346,6 @@ const close = () => {
   padding: 0.625rem 1.25rem;
   background: var(--bg-sunk);
   border: 1px solid var(--border);
-  border-radius: 8px;
   font-weight: 500;
   font-size: 0.875rem;
   color: var(--text-soft);

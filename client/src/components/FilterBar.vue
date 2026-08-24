@@ -146,26 +146,34 @@ export default {
   white-space: nowrap;
 }
 
+/* Field prompt, the way a panel labels an input area. */
+.filter-group label::after {
+  content: ':';
+  color: var(--text-dim);
+}
+
 .filter-select {
   padding: 0.3rem var(--space-2);
   border: 1px solid var(--border-strong);
-  border-radius: var(--radius);
   font-family: inherit;
   font-size: 0.8125rem;
   font-weight: 500;
   color: var(--text);
   background: var(--bg-surface);
   cursor: pointer;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  transition: border-color 0.15s ease, color 0.15s ease;
   min-width: 132px;
 }
 
-.filter-select:hover { border-color: var(--text-faint); }
+.filter-select:hover {
+  border-color: var(--accent-border);
+  color: var(--accent);
+}
 
 .filter-select:focus {
   outline: none;
-  border-color: var(--copper);
-  box-shadow: 0 0 0 3px var(--copper-dim);
+  border-color: var(--accent-bright);
+  color: var(--accent-bright);
 }
 
 .reset-filters-btn {
@@ -175,7 +183,6 @@ export default {
   padding: 0.3rem;
   background: var(--bg-surface);
   border: 1px solid var(--border);
-  border-radius: var(--radius);
   color: var(--text-faint);
   cursor: pointer;
   transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
@@ -183,9 +190,9 @@ export default {
 }
 
 .reset-filters-btn:hover:not(:disabled) {
-  background: var(--copper-soft);
-  border-color: var(--copper);
-  color: var(--copper);
+  background: var(--accent-dim);
+  border-color: var(--accent);
+  color: var(--accent-bright);
 }
 
 .reset-filters-btn:disabled { opacity: 0.3; cursor: not-allowed; }

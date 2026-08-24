@@ -24,9 +24,7 @@
                 <h4 class="product-name">{{ product.name }}</h4>
                 <div class="product-sku">SKU: {{ product.sku }}</div>
               </div>
-              <span class="stock-badge" :class="getStockBadgeClass(product.stockLevel)">
-                {{ product.stockLevel }}
-              </span>
+              <span class="stock-badge" :class="getStockBadgeClass(product.stockLevel)">{{ product.stockLevel }}</span>
             </div>
 
             <div class="info-grid">
@@ -68,9 +66,7 @@
               <div class="info-item">
                 <div class="info-label">Stock Status</div>
                 <div class="info-value">
-                  <span :class="['badge', getStockBadgeClass(product.stockLevel)]">
-                    {{ product.stockLevel }}
-                  </span>
+                  <span :class="['badge', getStockBadgeClass(product.stockLevel)]">{{ product.stockLevel }}</span>
                 </div>
               </div>
             </div>
@@ -147,8 +143,6 @@ const getStockBadgeClass = (stockLevel) => {
 
 .modal-container {
   background: var(--bg-surface);
-  border-radius: 12px;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
   max-width: 700px;
   width: 100%;
   max-height: 90vh;
@@ -181,7 +175,6 @@ const getStockBadgeClass = (stockLevel) => {
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 6px;
   transition: all 0.15s ease;
 }
 
@@ -208,12 +201,12 @@ const getStockBadgeClass = (stockLevel) => {
 .product-icon {
   width: 64px;
   height: 64px;
-  background: var(--copper);
-  border-radius: 12px;
+  background: var(--accent);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: white;
+  color: var(--bg-app);
+  text-shadow: none;
   flex-shrink: 0;
 }
 
@@ -237,7 +230,6 @@ const getStockBadgeClass = (stockLevel) => {
 
 .stock-badge {
   padding: 0.5rem 1rem;
-  border-radius: 6px;
   font-size: 0.875rem;
   font-weight: 600;
   text-transform: uppercase;
@@ -298,7 +290,6 @@ const getStockBadgeClass = (stockLevel) => {
   padding: 0.625rem 1.25rem;
   background: var(--bg-sunk);
   border: 1px solid var(--border);
-  border-radius: 8px;
   font-weight: 500;
   font-size: 0.875rem;
   color: var(--text-soft);

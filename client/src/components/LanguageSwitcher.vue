@@ -100,7 +100,6 @@ const selectLanguage = (locale) => {
   padding: 0.5rem 0.875rem;
   background: var(--bg-surface);
   border: 1px solid var(--border);
-  border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s ease;
   font-family: inherit;
@@ -139,8 +138,6 @@ const selectLanguage = (locale) => {
   min-width: 160px;
   background: var(--bg-surface);
   border: 1px solid var(--border);
-  border-radius: 10px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
   z-index: 1000;
   overflow: hidden;
 }
@@ -168,8 +165,8 @@ const selectLanguage = (locale) => {
 }
 
 .dropdown-item.active {
-  background: var(--copper-soft);
-  color: var(--copper);
+  background: var(--accent-soft);
+  color: var(--accent);
 }
 
 .language-name {
@@ -177,7 +174,7 @@ const selectLanguage = (locale) => {
 }
 
 .check-icon {
-  color: var(--copper);
+  color: var(--accent);
   flex-shrink: 0;
 }
 </style>

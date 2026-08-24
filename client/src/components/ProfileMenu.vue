@@ -127,7 +127,6 @@ const handleLogout = () => {
   padding: 0.5rem 0.875rem;
   background: var(--bg-surface);
   border: 1px solid var(--border);
-  border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s ease;
   font-family: inherit;
@@ -141,9 +140,9 @@ const handleLogout = () => {
 .avatar {
   width: 32px;
   height: 32px;
-  border-radius: 50%;
-  background: var(--copper);
-  color: white;
+  background: var(--accent);
+  color: var(--bg-app);
+  text-shadow: none;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -174,8 +173,6 @@ const handleLogout = () => {
   min-width: 280px;
   background: var(--bg-surface);
   border: 1px solid var(--border);
-  border-radius: 10px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
   z-index: 1000;
   overflow: hidden;
 }
@@ -191,9 +188,9 @@ const handleLogout = () => {
 .avatar-large {
   width: 48px;
   height: 48px;
-  border-radius: 50%;
-  background: var(--copper);
-  color: white;
+  background: var(--accent);
+  color: var(--bg-app);
+  text-shadow: none;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -269,12 +266,12 @@ const handleLogout = () => {
 
 .task-badge {
   margin-left: auto;
-  background: var(--copper);
-  color: white;
+  background: var(--accent);
+  color: var(--bg-app);
+  text-shadow: none;
   font-size: 0.75rem;
   font-weight: 600;
   padding: 0.125rem 0.5rem;
-  border-radius: 12px;
   min-width: 20px;
   text-align: center;
 }

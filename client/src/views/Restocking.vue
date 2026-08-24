@@ -98,9 +98,7 @@
                     <div class="item-name">{{ translateProductName(row.name) }}</div>
                     <div class="item-sub">
                       <span class="sku">{{ row.sku }}</span>
-                      <span :class="['badge', urgencyClass(row.urgency)]">
-                        {{ t(`restocking.urgency.${row.urgency}`) }}
-                      </span>
+                      <span :class="['badge', urgencyClass(row.urgency)]">{{ t(`restocking.urgency.${row.urgency}`) }}</span>
                       <span class="warehouse">{{ translateWarehouse(row.warehouse) }}</span>
                     </div>
                     <div class="item-source" :title="t(`restocking.source.${row.demand_source}`)">
@@ -176,9 +174,7 @@
                   <div class="item-name">{{ translateProductName(row.name) }}</div>
                   <div class="item-sub">
                     <span class="sku">{{ row.sku }}</span>
-                    <span :class="['badge', urgencyClass(row.urgency)]">
-                      {{ t(`restocking.urgency.${row.urgency}`) }}
-                    </span>
+                    <span :class="['badge', urgencyClass(row.urgency)]">{{ t(`restocking.urgency.${row.urgency}`) }}</span>
                   </div>
                 </td>
                 <td class="col-num">{{ row.quantity_on_hand.toLocaleString() }}</td>
@@ -448,7 +444,6 @@ export default {
   -webkit-appearance: none;
   appearance: none;
   height: 6px;
-  border-radius: 3px;
   background: var(--border);
   outline: none;
   cursor: pointer;
@@ -459,24 +454,20 @@ export default {
   appearance: none;
   width: 20px;
   height: 20px;
-  border-radius: 50%;
   background: var(--text);
   border: 2px solid var(--bg-surface);
-  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.3);
   cursor: pointer;
 }
 
 .budget-slider::-moz-range-thumb {
   width: 18px;
   height: 18px;
-  border-radius: 50%;
   background: var(--text);
   border: 2px solid var(--bg-surface);
   cursor: pointer;
 }
 
 .budget-slider:focus-visible {
-  box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.15);
 }
 
 .slider-scale {
@@ -490,7 +481,6 @@ export default {
 
 .usage-track {
   height: 4px;
-  border-radius: 2px;
   background: var(--bg-sunk);
   overflow: hidden;
   margin-top: 1rem;
@@ -562,7 +552,6 @@ tr.excluded { opacity: 0.45; }
   width: 100%;
   padding: 0.35rem 0.5rem;
   border: 1px solid var(--border-strong);
-  border-radius: 6px;
   font-size: 0.875rem;
   text-align: right;
   color: var(--text);
@@ -573,7 +562,6 @@ tr.excluded { opacity: 0.45; }
 .qty-input:focus {
   outline: none;
   border-color: var(--text);
-  box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.08);
 }
 
 .qty-input:disabled {
@@ -611,7 +599,6 @@ tr.excluded { opacity: 0.45; }
 .place-order-btn {
   padding: 0.65rem 1.5rem;
   border: none;
-  border-radius: 6px;
   background: var(--text);
   color: var(--bg-surface);
   font-size: 0.875rem;
@@ -632,7 +619,6 @@ tr.excluded { opacity: 0.45; }
   padding: 0.85rem 1.25rem;
   border: 1px solid var(--green-border);
   border-left: 3px solid var(--green);
-  border-radius: 6px;
   background: var(--green-soft);
   color: var(--green);
   font-size: 0.875rem;

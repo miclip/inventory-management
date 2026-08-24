@@ -64,9 +64,7 @@
                 <td><strong>{{ currencySymbol }}{{ (item.quantity_on_hand * item.unit_cost).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) }}</strong></td>
                 <td>{{ translateWarehouse(item.location) }}</td>
                 <td>
-                  <span :class="['badge', getStockStatusClass(item)]">
-                    {{ getStockStatus(item) }}
-                  </span>
+                  <span :class="['badge', getStockStatusClass(item)]">{{ getStockStatus(item) }}</span>
                 </td>
               </tr>
             </tbody>
@@ -274,7 +272,6 @@ export default {
   width: 100%;
   padding: 0.5rem 2.5rem 0.5rem 2.5rem;
   border: 1px solid var(--border-strong);
-  border-radius: 8px;
   font-size: 0.875rem;
   color: var(--text);
   background: var(--bg-sunk);
@@ -283,9 +280,8 @@ export default {
 
 .search-input:focus {
   outline: none;
-  border-color: var(--copper);
+  border-color: var(--accent);
   background: var(--bg-surface);
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
 .search-input::placeholder {
@@ -301,7 +297,6 @@ export default {
   padding: 0.25rem;
   background: transparent;
   border: none;
-  border-radius: 4px;
   color: var(--text-dim);
   cursor: pointer;
   transition: all 0.2s;
@@ -334,6 +329,6 @@ export default {
 }
 
 .clickable-row:hover {
-  background: var(--copper-soft) !important;
+  background: var(--accent-soft) !important;
 }
 </style>

@@ -58,9 +58,7 @@
                 <td>{{ item.quantity_needed }}</td>
                 <td>{{ item.quantity_available }}</td>
                 <td>
-                  <span class="badge danger">
-                    {{ item.quantity_needed - item.quantity_available }} units short
-                  </span>
+                  <span class="badge danger">{{ item.quantity_needed - item.quantity_available }} units short</span>
                 </td>
                 <td>
                   <span :style="{ color: item.days_delayed > 7 ? 'var(--red)' : 'var(--amber)' }">
@@ -68,9 +66,7 @@
                   </span>
                 </td>
                 <td>
-                  <span :class="['badge', item.priority]">
-                    {{ item.priority }}
-                  </span>
+                  <span :class="['badge', item.priority]">{{ item.priority }}</span>
                 </td>
               </tr>
             </tbody>

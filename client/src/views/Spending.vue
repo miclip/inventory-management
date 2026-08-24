@@ -533,7 +533,6 @@ export default {
 .legend-dot {
   width: 12px;
   height: 12px;
-  border-radius: 3px;
 }
 
 .legend-dot.procurement { background: var(--series-1); }
@@ -559,7 +558,7 @@ export default {
 }
 
 .profit-card::before {
-  background: var(--copper);
+  background: var(--accent);
 }
 
 .stat-meta {
@@ -590,7 +589,6 @@ export default {
 .revenue-bar, .cost-bar {
   width: 50%;
   max-width: 30px;
-  border-radius: 6px 6px 0 0;
   transition: all 0.3s ease;
   cursor: pointer;
   min-height: 4px;
@@ -669,11 +667,9 @@ export default {
 }
 
 .bar-segment:first-child {
-  border-radius: 0 0 6px 6px;
 }
 
 .bar-segment:last-child {
-  border-radius: 6px 6px 0 0;
 }
 
 .bar-segment.procurement { background: var(--series-1); }
@@ -723,7 +719,7 @@ export default {
 
 .category-amount {
   font-weight: 700;
-  color: var(--copper);
+  color: var(--accent);
   font-size: 1.125rem;
 }
 
@@ -731,14 +727,12 @@ export default {
   width: 100%;
   height: 8px;
   background: var(--bg-sunk);
-  border-radius: 4px;
   overflow: hidden;
 }
 
 .category-bar {
   height: 100%;
-  background: linear-gradient(90deg, var(--copper-bright) 0%, var(--copper) 100%);
-  border-radius: 4px;
+  background: var(--accent);
   transition: width 0.6s ease;
 }
 
@@ -817,7 +811,7 @@ export default {
 }
 
 .transactions-table tbody tr.clickable-row:hover {
-  background: var(--copper-soft);
+  background: var(--accent-soft);
 }
 
 .transaction-id {

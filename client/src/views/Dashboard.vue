@@ -194,9 +194,7 @@
                   <td @click="showBacklogDetail(item)" style="cursor: pointer;">{{ item.quantity_needed }}</td>
                   <td @click="showBacklogDetail(item)" style="cursor: pointer;">{{ item.quantity_available }}</td>
                   <td @click="showBacklogDetail(item)" style="cursor: pointer;">
-                    <span class="badge danger">
-                      {{ Math.abs(item.quantity_needed - item.quantity_available) }} {{ t('dashboard.inventoryShortages.unitsShort') }}
-                    </span>
+                    <span class="badge danger">{{ Math.abs(item.quantity_needed - item.quantity_available) }} {{ t('dashboard.inventoryShortages.unitsShort') }}</span>
                   </td>
                   <td @click="showBacklogDetail(item)" style="cursor: pointer;">
                     <span :style="{ color: item.days_delayed > 7 ? 'var(--red)' : 'var(--amber)', fontWeight: 600 }">
@@ -204,9 +202,7 @@
                     </span>
                   </td>
                   <td @click="showBacklogDetail(item)" style="cursor: pointer;">
-                    <span :class="['badge', item.priority]">
-                      {{ translatePriority(item.priority) }}
-                    </span>
+                    <span :class="['badge', item.priority]">{{ translatePriority(item.priority) }}</span>
                   </td>
                   <td>
                     <button
@@ -262,9 +258,7 @@
                   <td><strong>{{ formatCurrency(item.revenue, selectedCurrency) }}</strong></td>
                   <td>{{ formatDate(item.firstOrderDate) }}</td>
                   <td>
-                    <span :class="['badge', getStockBadge(item.stockLevel)]">
-                      {{ translateStockLevel(item.stockLevel) }}
-                    </span>
+                    <span :class="['badge', getStockBadge(item.stockLevel)]">{{ translateStockLevel(item.stockLevel) }}</span>
                   </td>
                 </tr>
               </tbody>
@@ -761,7 +755,6 @@ export default {
 .kpi-card {
   background: var(--bg-surface);
   border: 1px solid var(--border);
-  border-radius: 10px;
   padding: 1rem;
 }
 
@@ -795,14 +788,12 @@ export default {
   width: 100%;
   height: 6px;
   background: var(--bg-sunk);
-  border-radius: 3px;
   overflow: hidden;
 }
 
 .kpi-progress {
   height: 100%;
-  background: var(--copper);
-  border-radius: 3px;
+  background: var(--accent);
   transition: width 0.6s ease;
 }
 
@@ -854,7 +845,6 @@ export default {
 .legend-dot {
   width: 10px;
   height: 10px;
-  border-radius: 2px;
 }
 
 /* Order Health Dashboard Styles */
@@ -979,7 +969,6 @@ export default {
   flex: 1;
   height: 32px;
   background: var(--bg-sunk);
-  border-radius: 6px;
   overflow: hidden;
 }
 
@@ -995,7 +984,8 @@ export default {
 .h-bar-value {
   font-size: 0.813rem;
   font-weight: 700;
-  color: white;
+  color: var(--bg-app);
+  text-shadow: none;
 }
 
 .line-chart {
@@ -1044,21 +1034,18 @@ export default {
   width: 100%;
   max-width: 60px;
   min-height: 8px;
-  background: var(--copper);
-  border-radius: 6px 6px 0 0;
+  background: var(--accent);
   transition: all 0.3s ease;
   cursor: pointer;
-  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
 }
 
 .line-bar.empty-bar {
   background: var(--border);
-  box-shadow: none;
   min-height: 4px;
 }
 
 .line-bar:hover {
-  background: var(--copper-deep);
+  background: var(--accent-deep);
   transform: scaleY(1.05);
 }
 
@@ -1109,7 +1096,7 @@ export default {
 }
 
 .clickable-row:hover {
-  background: var(--copper-soft) !important;
+  background: var(--accent-soft) !important;
 }
 
 /* Tasks Card Styles */
@@ -1131,22 +1118,21 @@ export default {
   flex: 1;
   padding: 0.75rem;
   border: 2px solid var(--border);
-  border-radius: 8px;
   font-size: 0.95rem;
   transition: border-color 0.2s ease;
 }
 
 .task-input:focus {
   outline: none;
-  border-color: var(--copper);
+  border-color: var(--accent);
 }
 
 .task-add-btn {
   padding: 0.75rem 1.5rem;
-  background: var(--copper);
-  color: white;
+  background: var(--accent);
+  color: var(--bg-app);
+  text-shadow: none;
   border: none;
-  border-radius: 8px;
   font-weight: 600;
   cursor: pointer;
   transition: transform 0.2s ease, opacity 0.2s ease;
@@ -1180,7 +1166,6 @@ export default {
   gap: 0.75rem;
   padding: 0.75rem;
   background: var(--bg-sunk);
-  border-radius: 8px;
   border: 2px solid transparent;
   transition: all 0.2s ease;
 }
@@ -1203,7 +1188,7 @@ export default {
   width: 20px;
   height: 20px;
   cursor: pointer;
-  accent-color: var(--copper);
+  accent-color: var(--accent);
 }
 
 .task-text {
@@ -1218,9 +1203,9 @@ export default {
   width: 28px;
   height: 28px;
   background: var(--red);
-  color: white;
+  color: var(--bg-app);
+  text-shadow: none;
   border: none;
-  border-radius: 6px;
   font-size: 1.25rem;
   line-height: 1;
   cursor: pointer;
@@ -1239,7 +1224,6 @@ export default {
 .po-button {
   padding: 0.5rem 1rem;
   border: none;
-  border-radius: 6px;
   font-size: 0.813rem;
   font-weight: 600;
   cursor: pointer;
@@ -1248,24 +1232,24 @@ export default {
 }
 
 .po-button.create {
-  background: var(--copper);
-  color: white;
+  background: var(--accent);
+  color: var(--bg-app);
+  text-shadow: none;
 }
 
 .po-button.create:hover {
-  background: var(--copper-deep);
+  background: var(--accent-deep);
   transform: translateY(-1px);
-  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
 }
 
 .po-button.view {
   background: var(--text-faint);
-  color: white;
+  color: var(--bg-app);
+  text-shadow: none;
 }
 
 .po-button.view:hover {
   background: var(--text-soft);
   transform: translateY(-1px);
-  box-shadow: 0 2px 4px rgba(100, 116, 139, 0.3);
 }
 </style>

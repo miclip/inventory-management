@@ -790,8 +790,11 @@
     <div class="title">Charts are hand-written SVG</div>
     <div class="body">
       There is no charting dependency. Every bar, line, and donut is inline SVG bound to a
-      computed property, styled with the slate palette (<code>#0f172a</code>,
-      <code>#64748b</code>, <code>#e2e8f0</code>) and no emoji.
+      computed property. Colours come from the CSS custom properties on <code>:root</code> in
+      <code>App.vue</code> — <code>--accent</code> and the intensity ladder for single-series
+      marks, <code>--series-1..4</code> for multi-series, and the status hues only where they
+      carry meaning. <code>var()</code> resolves inside SVG presentation attributes, so
+      <code>stroke="var(--blue)"</code> works and is used by the order-health donut.
     </div>
   </div>
 </section>

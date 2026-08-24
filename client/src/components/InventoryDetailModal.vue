@@ -25,9 +25,7 @@
                 <h4 class="item-name">{{ translateProductName(inventoryItem.name) }}</h4>
                 <div class="item-sku">SKU: {{ inventoryItem.sku }}</div>
               </div>
-              <span class="stock-badge" :class="getStockStatusClass()">
-                {{ getStockStatus() }}
-              </span>
+              <span class="stock-badge" :class="getStockStatusClass()">{{ getStockStatus() }}</span>
             </div>
 
             <div class="stock-summary">
@@ -87,9 +85,7 @@
               <div class="info-item">
                 <div class="info-label">Status</div>
                 <div class="info-value">
-                  <span :class="['badge', getStockStatusClass()]">
-                    {{ getStockStatus() }}
-                  </span>
+                  <span :class="['badge', getStockStatusClass()]">{{ getStockStatus() }}</span>
                 </div>
               </div>
             </div>
@@ -191,8 +187,6 @@ const getSummaryCardClass = () => {
 
 .modal-container {
   background: var(--bg-surface);
-  border-radius: 12px;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
   max-width: 700px;
   width: 100%;
   max-height: 90vh;
@@ -225,7 +219,6 @@ const getSummaryCardClass = () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 6px;
   transition: all 0.15s ease;
 }
 
@@ -252,24 +245,24 @@ const getSummaryCardClass = () => {
 .item-icon {
   width: 64px;
   height: 64px;
-  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: white;
+  color: var(--bg-app);
+  text-shadow: none;
   flex-shrink: 0;
 }
 
 .item-icon.success-icon {
-  background: linear-gradient(135deg, var(--green) 0%, var(--green) 100%);
+  background: var(--green);
 }
 
 .item-icon.warning-icon {
-  background: linear-gradient(135deg, var(--amber) 0%, var(--amber) 100%);
+  background: var(--amber);
 }
 
 .item-icon.danger-icon {
-  background: linear-gradient(135deg, var(--red) 0%, var(--red) 100%);
+  background: var(--red);
 }
 
 .item-title-section {
@@ -292,7 +285,6 @@ const getSummaryCardClass = () => {
 
 .stock-badge {
   padding: 0.5rem 1rem;
-  border-radius: 6px;
   font-size: 0.875rem;
   font-weight: 600;
   text-transform: uppercase;
@@ -324,13 +316,12 @@ const getSummaryCardClass = () => {
 
 .summary-card {
   padding: 1.25rem;
-  border-radius: 10px;
   border: 2px solid;
 }
 
 .summary-card.primary {
-  border-color: var(--copper-border);
-  background: var(--copper-soft);
+  border-color: var(--accent-border);
+  background: var(--accent-soft);
 }
 
 .summary-card.success-card {
@@ -397,7 +388,7 @@ const getSummaryCardClass = () => {
 
 .info-value.total-value {
   font-size: 1.125rem;
-  color: var(--copper);
+  color: var(--accent);
   font-weight: 700;
 }
 
@@ -413,7 +404,6 @@ const getSummaryCardClass = () => {
   padding: 0.625rem 1.25rem;
   background: var(--bg-sunk);
   border: 1px solid var(--border);
-  border-radius: 8px;
   font-weight: 500;
   font-size: 0.875rem;
   color: var(--text-soft);

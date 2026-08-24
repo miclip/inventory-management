@@ -34,9 +34,7 @@
                 <td class="num">{{ formatMoney(q.total_revenue) }}</td>
                 <td class="num">{{ formatMoney(q.avg_order_value) }}</td>
                 <td>
-                  <span :class="['badge', getFulfillmentClass(q.fulfillment_rate)]">
-                    {{ q.fulfillment_rate }}%
-                  </span>
+                  <span :class="['badge', getFulfillmentClass(q.fulfillment_rate)]">{{ q.fulfillment_rate }}%</span>
                 </td>
               </tr>
             </tbody>
@@ -344,14 +342,13 @@ th.num { text-align: right; }
 .bar {
   width: 100%;
   min-height: 2px;
-  background: linear-gradient(to top, var(--copper), var(--copper-bright));
-  border-radius: 3px 3px 0 0;
+  background: var(--accent);
   transition: height 0.3s ease;
   cursor: pointer;
 }
 
 .bar:hover {
-  background: linear-gradient(to top, var(--copper-deep), var(--copper));
+  background: var(--accent-bright);
 }
 
 .bar-label {

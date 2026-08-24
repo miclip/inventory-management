@@ -91,9 +91,7 @@
                 </div>
 
                 <div class="task-footer">
-                  <span class="priority-badge" :class="task.priority">
-                    {{ translatePriority(task.priority) }}
-                  </span>
+                  <span class="priority-badge" :class="task.priority">{{ translatePriority(task.priority) }}</span>
                   <div class="task-due-date">
                     <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
                       <rect x="2" y="3" width="10" height="9" rx="1" stroke="currentColor" stroke-width="1.2"/>
@@ -101,9 +99,7 @@
                     </svg>
                     {{ formatDueDate(task.dueDate) }}
                   </div>
-                  <span class="status-badge" :class="getStatusClass(task.dueDate, task.status)">
-                    {{ getStatusText(task.dueDate, task.status) }}
-                  </span>
+                  <span class="status-badge" :class="getStatusClass(task.dueDate, task.status)">{{ getStatusText(task.dueDate, task.status) }}</span>
                 </div>
               </div>
             </div>
@@ -260,8 +256,6 @@ export default {
 
 .modal-container {
   background: var(--bg-surface);
-  border-radius: 12px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
   width: 90%;
   max-width: 700px;
   max-height: 85vh;
@@ -297,7 +291,6 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 6px;
   transition: all 0.2s ease;
 }
 
@@ -325,7 +318,6 @@ export default {
   background: var(--bg-sunk);
   color: var(--text-soft);
   border: none;
-  border-radius: 8px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -338,7 +330,6 @@ export default {
 /* Task Form */
 .task-form {
   background: var(--bg-sunk);
-  border-radius: 12px;
   padding: 1.5rem;
   margin-bottom: 1.5rem;
 }
@@ -379,7 +370,6 @@ label {
 .task-select {
   padding: 0.75rem;
   border: 2px solid var(--border);
-  border-radius: 8px;
   font-size: 0.95rem;
   transition: border-color 0.2s ease;
   font-family: inherit;
@@ -388,7 +378,7 @@ label {
 .task-input:focus,
 .task-select:focus {
   outline: none;
-  border-color: var(--copper);
+  border-color: var(--accent);
 }
 
 .task-select {
@@ -398,10 +388,10 @@ label {
 
 .task-add-btn {
   padding: 0.75rem 1.75rem;
-  background: var(--copper);
-  color: white;
+  background: var(--accent);
+  color: var(--bg-app);
+  text-shadow: none;
   border: none;
-  border-radius: 8px;
   font-weight: 600;
   cursor: pointer;
   transition: transform 0.2s ease, opacity 0.2s ease;
@@ -441,14 +431,12 @@ label {
 .task-item {
   background: var(--bg-surface);
   border: 2px solid var(--border);
-  border-radius: 10px;
   padding: 1rem 1.25rem;
   transition: all 0.2s ease;
 }
 
 .task-item:hover {
   border-color: var(--border-strong);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .task-item.priority-high {
@@ -486,7 +474,7 @@ label {
   width: 20px;
   height: 20px;
   cursor: pointer;
-  accent-color: var(--copper);
+  accent-color: var(--accent);
   flex-shrink: 0;
 }
 
@@ -509,9 +497,9 @@ label {
   width: 28px;
   height: 28px;
   background: var(--red);
-  color: white;
+  color: var(--bg-app);
+  text-shadow: none;
   border: none;
-  border-radius: 6px;
   font-size: 1.25rem;
   line-height: 1;
   cursor: pointer;
@@ -539,7 +527,6 @@ label {
   font-weight: 600;
   text-transform: uppercase;
   padding: 0.25rem 0.625rem;
-  border-radius: 4px;
   letter-spacing: 0.025em;
 }
 
@@ -574,7 +561,6 @@ label {
   font-size: 0.75rem;
   font-weight: 600;
   padding: 0.25rem 0.625rem;
-  border-radius: 4px;
   margin-left: auto;
 }
 

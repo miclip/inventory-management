@@ -121,9 +121,7 @@
                   </details>
                 </td>
                 <td class="col-status">
-                  <span :class="['badge', getOrderStatusClass(order.status)]">
-                    {{ t(`status.${order.status.toLowerCase()}`) }}
-                  </span>
+                  <span :class="['badge', getOrderStatusClass(order.status)]">{{ t(`status.${order.status.toLowerCase()}`) }}</span>
                 </td>
                 <td class="col-date">{{ formatDate(order.order_date) }}</td>
                 <td class="col-date">{{ formatDate(order.expected_delivery) }}</td>
@@ -303,7 +301,7 @@ export default {
 
 .items-summary {
   cursor: pointer;
-  color: var(--copper);
+  color: var(--accent);
   font-weight: 500;
   list-style: none;
   user-select: none;
@@ -327,7 +325,7 @@ export default {
 }
 
 .items-summary:hover {
-  color: var(--copper-deep);
+  color: var(--accent-deep);
   text-decoration: underline;
 }
 
@@ -339,8 +337,6 @@ export default {
   margin-top: 0.5rem;
   background: var(--bg-surface);
   border: 1px solid var(--border);
-  border-radius: 8px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
   padding: 0.75rem;
   z-index: 10;
   min-width: 300px;

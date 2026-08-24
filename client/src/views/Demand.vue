@@ -96,9 +96,7 @@
                   </span>
                 </td>
                 <td>
-                  <span :class="['badge', forecast.trend]">
-                    {{ t(`trends.${forecast.trend}`) }}
-                  </span>
+                  <span :class="['badge', forecast.trend]">{{ t(`trends.${forecast.trend}`) }}</span>
                 </td>
                 <td>{{ translatePeriod(forecast.period) }}</td>
               </tr>
@@ -234,13 +232,11 @@ export default {
 .trend-card {
   background: var(--bg-surface);
   border: 1px solid var(--border);
-  border-radius: 10px;
   padding: 1.5rem;
   transition: all 0.2s ease;
 }
 
 .trend-card:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
 .increasing-card {
@@ -270,7 +266,6 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 10px;
   font-size: 1.75rem;
   font-weight: 700;
   flex-shrink: 0;
@@ -318,7 +313,6 @@ export default {
   align-items: center;
   padding: 0.5rem 0.75rem;
   background: var(--bg-sunk);
-  border-radius: 6px;
   transition: background 0.2s;
 }
 

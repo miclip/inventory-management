@@ -1,7 +1,7 @@
 <template>
   <aside class="sidebar" :class="{ collapsed }">
     <div class="sidebar-brand">
-      <span class="brand-mark">CC</span>
+      <span class="brand-mark">CC<span class="brand-cursor">&#9608;</span></span>
       <span v-show="!collapsed" class="brand-text">
         <span class="brand-name">{{ t('nav.companyName') }}</span>
         <span class="brand-sub">{{ t('nav.subtitle') }}</span>
@@ -119,17 +119,24 @@ export default {
 
 .brand-mark {
   flex-shrink: 0;
-  width: 34px;
-  height: 34px;
-  display: grid;
-  place-items: center;
-  border: 1px solid var(--copper);
-  border-radius: 6px;
-  color: var(--copper-bright);
+  display: flex;
+  align-items: center;
+  gap: 1px;
+  padding: 0.15rem 0.35rem;
+  border: 1px solid var(--accent-border);
+  color: var(--accent-bright);
   font-family: var(--font-mono);
-  font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: 0.06em;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-shadow: var(--glow-bright);
+}
+
+.brand-cursor { animation: brand-blink 1.06s steps(1) infinite; }
+
+@keyframes brand-blink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
 }
 
 .brand-text {
@@ -139,10 +146,11 @@ export default {
 }
 
 .brand-name {
-  font-size: 0.875rem;
+  font-size: 0.75rem;
   font-weight: 600;
   color: var(--bezel-text-strong);
-  letter-spacing: -0.01em;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   white-space: nowrap;
 }
 
@@ -190,11 +198,12 @@ export default {
   display: flex;
   align-items: center;
   gap: var(--space-3);
-  padding: 0.5rem var(--space-3);
-  border-radius: 6px;
+  padding: 0.35rem var(--space-3) 0.35rem 1.1rem;
   color: var(--bezel-text);
-  font-size: 0.875rem;
+  font-size: 0.75rem;
   font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   text-decoration: none;
   white-space: nowrap;
   transition: background 0.15s ease, color 0.15s ease;
@@ -207,20 +216,18 @@ export default {
 
 /* vue-router supplies this class; no manual $route comparison needed. */
 .nav-item.router-link-exact-active {
-  background: var(--copper-dim);
-  color: var(--copper-bright);
+  background: var(--accent-dim);
+  color: var(--accent-bright);
+  text-shadow: var(--glow-bright);
 }
 
-/* Copper indicator rail — the instrument-panel tell. */
+/* Selection marker. A terminal menu pointed at the current line rather than
+   painting a rail beside it. */
 .nav-item.router-link-exact-active::before {
-  content: '';
+  content: '\25B8';
   position: absolute;
-  left: 0;
-  top: 20%;
-  bottom: 20%;
-  width: 2px;
-  border-radius: 0 2px 2px 0;
-  background: var(--copper);
+  left: 1px;
+  color: var(--accent);
 }
 
 .nav-icon {
@@ -254,10 +261,11 @@ export default {
   padding: 0.5rem var(--space-3);
   background: none;
   border: none;
-  border-radius: 6px;
   color: var(--bezel-text-dim);
   font-family: inherit;
-  font-size: 0.75rem;
+  font-size: 0.625rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
   cursor: pointer;
   transition: background 0.15s ease, color 0.15s ease;
 }
@@ -283,7 +291,6 @@ export default {
   padding: 0.5rem var(--space-3);
   background: transparent;
   border: 1px solid transparent;
-  border-radius: 6px;
   color: var(--bezel-text);
   font-size: 0.8125rem;
 }
@@ -300,6 +307,10 @@ export default {
 .sidebar :deep(.language-label),
 .sidebar :deep(.profile-name) {
   color: var(--bezel-text);
+  /* Match the nav: the chrome is uppercase throughout. */
+  font-size: 0.6875rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -310,10 +321,13 @@ export default {
 .sidebar :deep(.chevron-open) { transform: rotate(0deg); }
 
 .sidebar :deep(.avatar) {
-  width: 26px;
-  height: 26px;
-  font-size: 0.625rem;
-  background: var(--copper);
+  width: 24px;
+  height: 24px;
+  font-size: 0.5625rem;
+  letter-spacing: 0.06em;
+  background: var(--accent);
+  color: var(--bg-app);
+  text-shadow: none;
   flex-shrink: 0;
 }
 
@@ -403,8 +417,7 @@ export default {
     right: 20%;
     width: auto;
     height: 2px;
-    border-radius: 0 0 2px 2px;
-  }
+    }
 
   .sidebar-footer {
     margin-top: 0;

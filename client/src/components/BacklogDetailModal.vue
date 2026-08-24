@@ -24,9 +24,7 @@
                 <h4 class="item-name">{{ translateProductName(backlogItem.item_name) }}</h4>
                 <div class="item-sku">SKU: {{ backlogItem.item_sku }}</div>
               </div>
-              <span class="priority-badge" :class="backlogItem.priority">
-                {{ backlogItem.priority }} Priority
-              </span>
+              <span class="priority-badge" :class="backlogItem.priority">{{ backlogItem.priority }} Priority</span>
             </div>
 
             <div class="shortage-summary">
@@ -140,8 +138,6 @@ const formatDate = (dateString) => {
 
 .modal-container {
   background: var(--bg-surface);
-  border-radius: 12px;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
   max-width: 700px;
   width: 100%;
   max-height: 90vh;
@@ -174,7 +170,6 @@ const formatDate = (dateString) => {
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 6px;
   transition: all 0.15s ease;
 }
 
@@ -201,12 +196,12 @@ const formatDate = (dateString) => {
 .shortage-icon {
   width: 64px;
   height: 64px;
-  background: linear-gradient(135deg, var(--red) 0%, var(--red) 100%);
-  border-radius: 12px;
+  background: var(--red);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: white;
+  color: var(--bg-app);
+  text-shadow: none;
   flex-shrink: 0;
 }
 
@@ -230,7 +225,6 @@ const formatDate = (dateString) => {
 
 .priority-badge {
   padding: 0.5rem 1rem;
-  border-radius: 6px;
   font-size: 0.875rem;
   font-weight: 600;
   text-transform: uppercase;
@@ -262,7 +256,6 @@ const formatDate = (dateString) => {
 
 .summary-card {
   padding: 1.25rem;
-  border-radius: 10px;
   border: 2px solid;
 }
 
@@ -328,7 +321,7 @@ const formatDate = (dateString) => {
 .info-value.order-id,
 .info-value.sku {
   font-family: 'Monaco', 'Courier New', monospace;
-  color: var(--copper);
+  color: var(--accent);
 }
 
 .modal-footer {
@@ -343,7 +336,6 @@ const formatDate = (dateString) => {
   padding: 0.625rem 1.25rem;
   background: var(--bg-sunk);
   border: 1px solid var(--border);
-  border-radius: 8px;
   font-weight: 500;
   font-size: 0.875rem;
   color: var(--text-soft);
