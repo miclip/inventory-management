@@ -316,6 +316,34 @@ export default {
   },
 
   // Common
+  reports: {
+    title: '業績レポート',
+    description: '四半期業績指標と月次推移の表示',
+    quarterlyPerformance: '四半期業績',
+    monthlyRevenueTrend: '月次収益推移',
+    monthOverMonth: '前月比分析',
+    noData: '選択したフィルターのレポートデータがありません',
+    notAvailable: '該当なし',
+    quarterLabel: '{year}年 第{q}四半期',
+    table: {
+      quarter: '四半期',
+      totalOrders: '総注文数',
+      totalRevenue: '総収益',
+      avgOrderValue: '平均注文額',
+      fulfillmentRate: '履行率',
+      month: '月',
+      orders: '注文数',
+      revenue: '収益',
+      change: '変化',
+      growthRate: '成長率'
+    },
+    summary: {
+      totalRevenueYtd: '総収益（年初来）',
+      avgMonthlyRevenue: '平均月次収益',
+      totalOrdersYtd: '総注文数（年初来）',
+      bestQuarter: '最高業績四半期'
+    }
+  },
   restocking: {
     title: '補充発注',
     description: '予算を設定し、需要予測で不足が見込まれる品目を発注します',
