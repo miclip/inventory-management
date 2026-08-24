@@ -6,6 +6,10 @@ export default {
     orders: 'Orders',
     finance: 'Finance',
     demandForecast: 'Demand Forecast',
+    collapse: 'Collapse',
+    expand: 'Expand',
+    reports: 'Reports',
+    restocking: 'Restocking',
     companyName: 'Catalyst Components',
     subtitle: 'Inventory Management System'
   },
@@ -312,6 +316,105 @@ export default {
   },
 
   // Common
+  reports: {
+    title: 'Performance Reports',
+    description: 'View quarterly performance metrics and monthly trends',
+    quarterlyPerformance: 'Quarterly Performance',
+    monthlyRevenueTrend: 'Monthly Revenue Trend',
+    monthOverMonth: 'Month-over-Month Analysis',
+    noData: 'No report data for the selected filters',
+    notAvailable: 'N/A',
+    // {q} is the quarter number, {year} the calendar year
+    quarterLabel: 'Q{q} {year}',
+    table: {
+      quarter: 'Quarter',
+      totalOrders: 'Total Orders',
+      totalRevenue: 'Total Revenue',
+      avgOrderValue: 'Avg Order Value',
+      fulfillmentRate: 'Fulfillment Rate',
+      month: 'Month',
+      orders: 'Orders',
+      revenue: 'Revenue',
+      change: 'Change',
+      growthRate: 'Growth Rate'
+    },
+    summary: {
+      totalRevenueYtd: 'Total Revenue (YTD)',
+      avgMonthlyRevenue: 'Avg Monthly Revenue',
+      totalOrdersYtd: 'Total Orders (YTD)',
+      bestQuarter: 'Best Performing Quarter'
+    }
+  },
+  coverage: {
+    daysCover: 'Days Cover',
+    leadTime: 'Lead Time',
+    dailyDemand: 'Daily Demand',
+    reorderQty: 'Reorder Qty',
+    risk: 'Risk',
+    unbounded: 'No demand',
+    days: '{days}d',
+    atRisk: 'At Risk',
+    atRiskHint: 'Cover shorter than the supplier lead time',
+    level: {
+      stockout: 'Out of stock',
+      critical: 'Stockout before resupply',
+      warning: 'Thin margin',
+      ok: 'Covered',
+      idle: 'Idle stock'
+    }
+  },
+  restocking: {
+    title: 'Restocking',
+    description: 'Set a budget and order the items your forecast says you will run short of',
+    budget: 'Available Budget',
+    budgetHint: 'Drag to set how much you have to spend',
+    recommended: 'Recommended Order',
+    deferred: 'Over Budget',
+    deferredHint: 'Shortfalls a larger budget would cover',
+    allocated: 'Allocated',
+    remaining: 'Remaining',
+    totalNeed: 'Cost to clear all shortfalls',
+    itemsSelected: '{count} of {total} items selected',
+    placeOrder: 'Place Order',
+    placingOrder: 'Submitting...',
+    orderPlaced: 'Order {orderNumber} submitted — expected {date}',
+    overBudget: 'Selection exceeds budget by {amount}',
+    noRecommendations: 'No shortfalls at this budget. Increase the budget or clear the filters.',
+    nothingSelected: 'Select at least one item to place an order.',
+    leadTime: 'Lead Time',
+    leadTimeDays: '{days} days',
+    onHand: 'On Hand',
+    forecast: 'Forecast',
+    shortfall: 'Shortfall',
+    orderQty: 'Order Qty',
+    lineTotal: 'Line Total',
+    include: 'Include',
+    urgency: {
+      critical: 'Stockout before resupply',
+      high: 'Thin margin',
+      moderate: 'Moderate'
+    },
+    coverColumn: 'Cover',
+    source: {
+      forecast: 'Demand forecast',
+      order_history: 'Projected from order history'
+    }
+  },
+  submittedOrders: {
+    title: 'Submitted Orders',
+    description: 'Restocking orders you have placed',
+    empty: 'No restocking orders submitted yet.',
+    table: {
+      orderNumber: 'Order Number',
+      submitted: 'Submitted',
+      items: 'Items',
+      units: 'Units',
+      leadTime: 'Lead Time',
+      expectedDelivery: 'Expected Delivery',
+      status: 'Status',
+      totalValue: 'Total Value'
+    }
+  },
   common: {
     loading: 'Loading...',
     error: 'Error',

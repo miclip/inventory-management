@@ -48,6 +48,9 @@ npm install && npm run dev
 **Data Flow**: Vue filters → `client/src/api.js` → FastAPI → In-memory filtering → Pydantic validation → Computed properties
 **Reactivity**: Raw data in refs (`allOrders`, `inventoryItems`), derived data in computed properties
 
+## Code Style
+- Always document non-obvious logic changes with comments
+
 ## API Endpoints
 - `GET /api/inventory` - Filters: warehouse, category
 - `GET /api/orders` - Filters: warehouse, category, status, month
@@ -70,7 +73,22 @@ npm install && npm run dev
 - Styles: `client/src/App.vue`
 
 ## Design System
-- Colors: Slate/gray (#0f172a, #64748b, #e2e8f0)
-- Status: green/blue/yellow/red
-- Charts: Custom SVG, CSS Grid for layouts
-- No emojis in UI
+IBM 3270 greenscreen terminal. Every value is a CSS custom property defined on
+`:root` in `client/src/App.vue` — there is no hardcoded hex anywhere else in
+`client/src`, and new code must reference tokens rather than literals.
+
+- **Palette**: monochrome P1 phosphor on a dark CRT. Hierarchy comes from
+  intensity, not hue: `--accent` (bright) > `--text` > `--text-soft` >
+  `--text-faint` > `--text-dim`.
+- **Status only**: the 3270 extended colours `--green` / `--blue` / `--amber` /
+  `--red` carry meaning and are never used decoratively.
+- **Charts**: custom SVG. Multi-series charts use `--series-1..4`. Flat fills
+  only — a CRT draws no gradients.
+- **Shape**: `--radius` is `0` and `--shadow-*` is `none`. Do not reintroduce
+  rounded corners or shadows.
+- **Type**: IBM Plex Mono throughout (`--font-ui`); labels are uppercase with
+  positive letter-spacing. Use `font-variant-numeric: tabular-nums` on any
+  figure that updates reactively.
+- **Text on a lit fill** is inverse video (`color: var(--bg-app)` and
+  `text-shadow: none`), never white.
+- No emojis in UI. Box-drawing and geometric characters are fine.

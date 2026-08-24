@@ -27,6 +27,65 @@
         </div>
       </div>
 
+      <!-- Restocking orders placed from the Restocking tab. Kept above the
+           customer order table because it is the most recent activity. -->
+      <div v-if="submittedOrders.length" class="card">
+        <div class="card-header">
+          <h3 class="card-title">{{ t('submittedOrders.title') }} ({{ submittedOrders.length }})</h3>
+          <span class="card-subtitle">{{ t('submittedOrders.description') }}</span>
+        </div>
+        <div class="table-container">
+          <table class="submitted-table">
+            <thead>
+              <tr>
+                <th class="col-order-number">{{ t('submittedOrders.table.orderNumber') }}</th>
+                <th class="col-date">{{ t('submittedOrders.table.submitted') }}</th>
+                <th class="col-items">{{ t('submittedOrders.table.items') }}</th>
+                <th class="col-units">{{ t('submittedOrders.table.units') }}</th>
+                <th class="col-lead">{{ t('submittedOrders.table.leadTime') }}</th>
+                <th class="col-date">{{ t('submittedOrders.table.expectedDelivery') }}</th>
+                <th class="col-status">{{ t('submittedOrders.table.status') }}</th>
+                <th class="col-value">{{ t('submittedOrders.table.totalValue') }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="order in submittedOrders" :key="order.id">
+                <td class="col-order-number"><strong>{{ order.order_number }}</strong></td>
+                <td class="col-date">{{ formatDate(order.submitted_date) }}</td>
+                <td class="col-items">
+                  <details class="items-details">
+                    <summary class="items-summary">
+                      {{ t('orders.itemsCount', { count: order.item_count }) }}
+                    </summary>
+                    <div class="items-dropdown">
+                      <div v-for="line in order.items" :key="line.sku" class="item-entry">
+                        <span class="item-name">{{ translateProductName(line.name) }}</span>
+                        <span class="item-meta">
+                          {{ t('orders.quantity') }}: {{ line.quantity.toLocaleString() }}
+                          @ {{ currencySymbol }}{{ line.unit_cost }}
+                          &middot; {{ t('restocking.leadTimeDays', { days: line.lead_time_days }) }}
+                        </span>
+                      </div>
+                    </div>
+                  </details>
+                </td>
+                <td class="col-units">{{ order.total_units.toLocaleString() }}</td>
+                <td class="col-lead">
+                  <!-- Order-level lead time is the slowest line item, since the
+                       order ships complete. -->
+                  {{ t('restocking.leadTimeDays', { days: order.lead_time_days }) }}
+                </td>
+                <td class="col-date">{{ formatDate(order.expected_delivery) }}</td>
+                <td class="col-status"><span class="badge info">{{ order.status }}</span></td>
+                <td class="col-value">
+                  <strong>{{ currencySymbol }}{{ order.total_value.toLocaleString() }}</strong>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
       <div class="card">
         <div class="card-header">
           <h3 class="card-title">{{ t('orders.allOrders') }} ({{ orders.length }})</h3>
@@ -62,9 +121,7 @@
                   </details>
                 </td>
                 <td class="col-status">
-                  <span :class="['badge', getOrderStatusClass(order.status)]">
-                    {{ t(`status.${order.status.toLowerCase()}`) }}
-                  </span>
+                  <span :class="['badge', getOrderStatusClass(order.status)]">{{ t(`status.${order.status.toLowerCase()}`) }}</span>
                 </td>
                 <td class="col-date">{{ formatDate(order.order_date) }}</td>
                 <td class="col-date">{{ formatDate(order.expected_delivery) }}</td>
@@ -95,6 +152,7 @@ export default {
     const loading = ref(true)
     const error = ref(null)
     const orders = ref([])
+    const submittedOrders = ref([])
 
     // Use shared filters
     const {
@@ -121,6 +179,16 @@ export default {
         error.value = 'Failed to load orders: ' + err.message
       } finally {
         loading.value = false
+      }
+    }
+
+    // Restocking orders are internal purchase orders, not customer orders, so
+    // the filter bar does not apply to them and they load independently.
+    const loadSubmittedOrders = async () => {
+      try {
+        submittedOrders.value = await api.getRestockingOrders()
+      } catch (err) {
+        console.error('Failed to load submitted restocking orders:', err)
       }
     }
 
@@ -153,13 +221,17 @@ export default {
       })
     }
 
-    onMounted(loadOrders)
+    onMounted(() => {
+      loadOrders()
+      loadSubmittedOrders()
+    })
 
     return {
       t,
       loading,
       error,
       orders,
+      submittedOrders,
       getOrdersByStatus,
       getOrderStatusClass,
       formatDate,
@@ -203,6 +275,25 @@ export default {
   width: 120px;
 }
 
+/* Submitted (restocking) orders table */
+.submitted-table {
+  table-layout: fixed;
+  width: 100%;
+}
+
+.col-units {
+  width: 90px;
+}
+
+.col-lead {
+  width: 110px;
+}
+
+.card-subtitle {
+  font-size: 0.813rem;
+  color: var(--text-faint);
+}
+
 /* Items details styling */
 .items-details {
   position: relative;
@@ -210,7 +301,7 @@ export default {
 
 .items-summary {
   cursor: pointer;
-  color: #3b82f6;
+  color: var(--accent);
   font-weight: 500;
   list-style: none;
   user-select: none;
@@ -234,7 +325,7 @@ export default {
 }
 
 .items-summary:hover {
-  color: #2563eb;
+  color: var(--accent-deep);
   text-decoration: underline;
 }
 
@@ -244,10 +335,8 @@ export default {
   top: 100%;
   left: 0;
   margin-top: 0.5rem;
-  background: white;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
   padding: 0.75rem;
   z-index: 10;
   min-width: 300px;
@@ -259,7 +348,7 @@ export default {
   flex-direction: column;
   gap: 0.25rem;
   padding: 0.5rem;
-  border-bottom: 1px solid #f1f5f9;
+  border-bottom: 1px solid var(--bg-sunk);
 }
 
 .item-entry:last-child {
@@ -269,11 +358,11 @@ export default {
 .item-name {
   font-size: 0.875rem;
   font-weight: 500;
-  color: #0f172a;
+  color: var(--text);
 }
 
 .item-meta {
   font-size: 0.813rem;
-  color: #64748b;
+  color: var(--text-faint);
 }
 </style>

@@ -12,6 +12,16 @@ export const api = {
     return response.data
   },
 
+  async getInventoryCoverage(filters = {}) {
+    const params = new URLSearchParams()
+    // Coverage has no time or order-status dimension, same as plain inventory.
+    if (filters.warehouse && filters.warehouse !== 'all') params.append('warehouse', filters.warehouse)
+    if (filters.category && filters.category !== 'all') params.append('category', filters.category)
+
+    const response = await axios.get(`${API_BASE_URL}/inventory/coverage?${params.toString()}`)
+    return response.data
+  },
+
   async getInventoryItem(id) {
     const response = await axios.get(`${API_BASE_URL}/inventory/${id}`)
     return response.data
@@ -101,6 +111,50 @@ export const api = {
 
   async getPurchaseOrderByBacklogItem(backlogItemId) {
     const response = await axios.get(`${API_BASE_URL}/purchase-orders/${backlogItemId}`)
+    return response.data
+  },
+
+  async getRestockingRecommendations(budget, filters = {}) {
+    const params = new URLSearchParams()
+    params.append('budget', budget)
+    // Restocking has no time or order-status dimension, so only the warehouse
+    // and category filters are forwarded.
+    if (filters.warehouse && filters.warehouse !== 'all') params.append('warehouse', filters.warehouse)
+    if (filters.category && filters.category !== 'all') params.append('category', filters.category)
+
+    const response = await axios.get(`${API_BASE_URL}/restocking/recommendations?${params.toString()}`)
+    return response.data
+  },
+
+  async getRestockingOrders() {
+    const response = await axios.get(`${API_BASE_URL}/restocking-orders`)
+    return response.data
+  },
+
+  async createRestockingOrder(orderData) {
+    const response = await axios.post(`${API_BASE_URL}/restocking-orders`, orderData)
+    return response.data
+  },
+
+  async getQuarterlyReports(filters = {}) {
+    const params = new URLSearchParams()
+    if (filters.warehouse && filters.warehouse !== 'all') params.append('warehouse', filters.warehouse)
+    if (filters.category && filters.category !== 'all') params.append('category', filters.category)
+    if (filters.status && filters.status !== 'all') params.append('status', filters.status)
+    if (filters.month && filters.month !== 'all') params.append('month', filters.month)
+
+    const response = await axios.get(`${API_BASE_URL}/reports/quarterly?${params.toString()}`)
+    return response.data
+  },
+
+  async getMonthlyTrends(filters = {}) {
+    const params = new URLSearchParams()
+    if (filters.warehouse && filters.warehouse !== 'all') params.append('warehouse', filters.warehouse)
+    if (filters.category && filters.category !== 'all') params.append('category', filters.category)
+    if (filters.status && filters.status !== 'all') params.append('status', filters.status)
+    if (filters.month && filters.month !== 'all') params.append('month', filters.month)
+
+    const response = await axios.get(`${API_BASE_URL}/reports/monthly-trends?${params.toString()}`)
     return response.data
   }
 }

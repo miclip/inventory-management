@@ -32,7 +32,7 @@
           <h3 class="card-title">Backlog Items</h3>
         </div>
         <div v-if="backlogItems.length === 0" style="padding: 3rem; text-align: center;">
-          <p style="font-size: 1.125rem; color: #10b981; font-weight: 600;">
+          <p style="font-size: 1.125rem; color: var(--green); font-weight: 600;">
             ✓ No backlog items - all orders can be fulfilled!
           </p>
         </div>
@@ -58,19 +58,15 @@
                 <td>{{ item.quantity_needed }}</td>
                 <td>{{ item.quantity_available }}</td>
                 <td>
-                  <span class="badge danger">
-                    {{ item.quantity_needed - item.quantity_available }} units short
-                  </span>
+                  <span class="badge danger">{{ item.quantity_needed - item.quantity_available }} units short</span>
                 </td>
                 <td>
-                  <span :style="{ color: item.days_delayed > 7 ? '#ef4444' : '#f59e0b' }">
+                  <span :style="{ color: item.days_delayed > 7 ? 'var(--red)' : 'var(--amber)' }">
                     {{ item.days_delayed }} days
                   </span>
                 </td>
                 <td>
-                  <span :class="['badge', item.priority]">
-                    {{ item.priority }}
-                  </span>
+                  <span :class="['badge', item.priority]">{{ item.priority }}</span>
                 </td>
               </tr>
             </tbody>

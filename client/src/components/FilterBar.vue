@@ -102,93 +102,114 @@ export default {
 
 <style scoped>
 .filters-bar {
-  background: #f8fafc;
-  border-bottom: 1px solid #e2e8f0;
-  padding: 0.75rem 0;
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border);
+  padding: var(--space-3) 0;
   position: sticky;
-  top: 70px;
-  z-index: 90;
+  /* Was hardcoded to 70px to clear the old top nav. With the nav in the
+     sidebar there is nothing above this bar, so the offset comes from the
+     shared token instead of a magic number duplicated across two files. */
+  top: var(--topbar-h);
+  z-index: 40;
 }
 
 .filters-container {
-  max-width: 1600px;
+  max-width: 1500px;
   margin: 0 auto;
-  padding: 0 2rem;
+  padding: 0 var(--space-6);
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: var(--space-4);
 }
 
 .filters-grid {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: var(--space-4);
   flex: 1;
+  flex-wrap: wrap;
 }
 
 .filter-group {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: var(--space-2);
 }
 
 .filter-group label {
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: #64748b;
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  font-weight: 500;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--text-faint);
   white-space: nowrap;
 }
 
+/* Field prompt, the way a panel labels an input area. */
+.filter-group label::after {
+  content: ':';
+  color: var(--text-dim);
+}
+
 .filter-select {
-  padding: 0.4rem 0.75rem;
-  border: 1px solid #cbd5e1;
-  border-radius: 6px;
-  font-size: 0.813rem;
-  color: #0f172a;
-  background: white;
-  cursor: pointer;
-  transition: all 0.2s;
+  padding: 0.3rem var(--space-2);
+  border: 1px solid var(--border-strong);
+  font-family: inherit;
+  font-size: 0.8125rem;
   font-weight: 500;
-  min-width: 140px;
+  color: var(--text);
+  background: var(--bg-surface);
+  cursor: pointer;
+  transition: border-color 0.15s ease, color 0.15s ease;
+  min-width: 132px;
 }
 
 .filter-select:hover {
-  border-color: #94a3b8;
+  border-color: var(--accent-border);
+  color: var(--accent);
 }
 
 .filter-select:focus {
   outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  border-color: var(--accent-bright);
+  color: var(--accent-bright);
 }
 
 .reset-filters-btn {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0.4rem;
-  background: white;
-  border: 1px solid #e2e8f0;
-  border-radius: 6px;
-  color: #64748b;
+  padding: 0.3rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  color: var(--text-faint);
   cursor: pointer;
-  transition: all 0.2s;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
   flex-shrink: 0;
 }
 
 .reset-filters-btn:hover:not(:disabled) {
-  background: #f8fafc;
-  border-color: #cbd5e1;
-  color: #0f172a;
+  background: var(--accent-dim);
+  border-color: var(--accent);
+  color: var(--accent-bright);
 }
 
-.reset-filters-btn:disabled {
-  opacity: 0.3;
-  cursor: not-allowed;
+.reset-filters-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+.reset-filters-btn svg { width: 17px; height: 17px; }
+
+@media (max-width: 1024px) {
+  .filters-container { padding: 0 var(--space-5); }
 }
 
-.reset-filters-btn svg {
-  width: 18px;
-  height: 18px;
+@media (max-width: 768px) {
+  .filters-container { padding: 0 var(--space-4); }
+  .filter-group { flex: 1 1 auto; }
+  .filter-select { min-width: 0; width: 100%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .filter-select, .reset-filters-btn { transition: none; }
 }
 </style>
